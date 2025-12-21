@@ -1,122 +1,190 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "theme": "almond",
+  "name": "Pelatform Labs Documentation",
+  "description": "Documentation for Pelatform Labs packages, the collection of tools and resources to help you build modern web applications.",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#3dbd8d",
+    "light": "#87d6b8",
+    "dark": "#24b47e"
   },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
+  "favicon": "/favicon.png",
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/light.webp",
+    "dark": "/logo/dark.webp"
+  },
+  "background": {
+    "decoration": "windows"
+  },
+  "icons": {
+    "library": "lucide"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:labs@pelatform.com"
+      },
+      {
+        "label": "Home",
+        "href": "https://pelatform.com"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://dashboard.pelatform.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/pelatform",
+      "github": "https://github.com/pelatform",
+      "facebook": "https://www.facebook.com/profile.php?id=61574864862190"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      {
+        "title": "Open in T3 Chat",
+        "description": "Ask questions about this page",
+        "icon": "https://t3.chat/favicon.ico",
+        "href": {
+          "base": "https://t3.chat/new",
+          "query": [
+            {
+              "key": "q",
+              "value": "Read from https://docs.marblecms.com/$path so I can ask questions about it."
+            }
+          ]
+        }
+      },
+      "perplexity",
+      "mcp"
+    ]
   },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+  "errors": {
+    "404": {
+      "redirect": true
     }
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "icon": "rocket",
+        "pages": [
+          "index",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Toolkits",
+        "icon": "library",
+        "pages": [
+          "toolkits/index",
+          {
+            "group": "Config",
+            "pages": [
+              "toolkits/config/index",
+              "toolkits/config/biome",
+              "toolkits/config/eslint/index",
+              "toolkits/config/eslint/react",
+              "toolkits/config/eslint/vite",
+              "toolkits/config/tsconfig"
+            ]
+          },
+          {
+            "group": "Email",
+            "pages": [
+              "toolkits/email/index",
+              "toolkits/email/api",
+              "toolkits/email/examples"
+            ]
+          },
+          {
+            "group": "Storage",
+            "pages": [
+              "toolkits/storage/index",
+              "toolkits/storage/api",
+              "toolkits/storage/examples"
+            ]
+          },
+          {
+            "group": "Utils",
+            "pages": [
+              "toolkits/storage/index",
+              "toolkits/storage/server"
+            ]
+          }
+        ]
+      },
+      {
+        "group": "UI Core",
+        "icon": "palette",
+        "pages": [
+          "ui/index",
+          "ui/general",
+          "ui/hook"
+        ]
+      },
+      {
+        "group": "UI Components",
+        "icon": "component",
+        "pages": [
+          "ui/animation",
+          "ui/aria",
+          "ui/base",
+          "ui/default"
+        ]
+      },
+      {
+        "hidden": true,
+        "group": "Core",
+        "pages": [
+          "sample/core/text",
+          "sample/core/code",
+          "sample/core/changelogs",
+          "sample/core/image-embeds",
+          "sample/core/list-table",
+          "sample/core/reusable-snippets",
+          "sample/core/package"
+        ]
+      },
+      {
+        "hidden": true,
+        "group": "Components",
+        "pages": [
+          "sample/guide",
+          "sample/accordions",
+          "sample/badge",
+          "sample/banner",
+          "sample/callouts",
+          "sample/cards",
+          "sample/code-groups",
+          "sample/color",
+          "sample/columns",
+          "sample/examples",
+          "sample/expandables",
+          "sample/fields",
+          "sample/frames",
+          "sample/icons",
+          "sample/mermaid-diagrams",
+          "sample/panel",
+          "sample/responses",
+          "sample/steps",
+          "sample/tabs",
+          "sample/tiles",
+          "sample/tooltips",
+          "sample/tree",
+          "sample/update",
+          "sample/view"
+        ]
+      }
+    ]
   }
 }
