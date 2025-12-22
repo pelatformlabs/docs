@@ -117,8 +117,8 @@
           {
             "group": "Utils",
             "pages": [
-              "toolkits/storage/index",
-              "toolkits/storage/server"
+              "toolkits/utils/index",
+              "toolkits/utils/server"
             ]
           }
         ]
@@ -144,7 +144,7 @@
       },
       {
         "hidden": true,
-        "group": "Core",
+        "group": "Sample Core",
         "pages": [
           "sample/core/text",
           "sample/core/code",
@@ -157,7 +157,7 @@
       },
       {
         "hidden": true,
-        "group": "Components",
+        "group": "Sample Components",
         "pages": [
           "sample/guide",
           "sample/accordions",

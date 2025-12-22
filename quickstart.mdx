@@ -4,6 +4,8 @@ description: "Get started with Pelatform tools and UI components for modern appl
 keywords: ["pelatform", "getting started", "installation", "setup", "tools", "ui"]
 ---
 
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+
 # Get Started with Pelatform
 
 Pelatform provides a comprehensive suite of development tools and UI components to help you build modern applications faster. Choose what you need based on your project requirements.
@@ -14,25 +16,33 @@ Pelatform provides a comprehensive suite of development tools and UI components 
 
 Pelatform offers two main categories of tools:
 
-<Cards>
-  <Card title="Development Toolkits" icon="wrench">
-    <ul>
-      <li><strong>Configs</strong>: ESLint, TypeScript, Biome configurations</li>
-      <li><strong>Utils</strong>: 100+ utility functions for common tasks</li>
-      <li><strong>Email</strong>: SMTP and email template utilities</li>
-      <li><strong>Storage</strong>: Multi-provider file storage abstraction</li>
-    </ul>
-  </Card>
+<AccordionGroup>
+  <Accordion icon="wrench" title="Development Toolkits">
+    Essential development utilities and configurations for modern applications:
 
-  <Card title="UI Components" icon="palette">
     <ul>
-      <li><strong>150+ Components</strong>: Complete UI component library</li>
-      <li><strong>Modern Stack</strong>: React, TailwindCSS, Radix UI</li>
-      <li><strong>Accessible</strong>: WCAG compliant out of the box</li>
-      <li><strong>TypeScript</strong>: Full type safety and IntelliSense</li>
+      <li><strong>Configs</strong>: ESLint, TypeScript, Biome configurations optimized for TypeScript projects</li>
+      <li><strong>Utils</strong>: 100+ utility functions for validation, crypto, datetime, strings, URLs, and more</li>
+      <li><strong>Email</strong>: Multi-provider email sending with React template support (Resend, SMTP)</li>
+      <li><strong>Storage</strong>: Multi-provider file storage abstraction (S3, Cloudflare R2, Cloudinary, MinIO)</li>
     </ul>
-  </Card>
-</Cards>
+
+    <Note>Perfect for backend APIs, full-stack applications, and development tooling.</Note>
+  </Accordion>
+
+  <Accordion icon="palette" title="UI Components">
+    Complete UI component library for building modern, accessible interfaces:
+
+    <ul>
+      <li><strong>150+ Components</strong>: Comprehensive component library with consistent design</li>
+      <li><strong>Modern Stack</strong>: Built with React, TailwindCSS, and Radix UI primitives</li>
+      <li><strong>Accessible</strong>: WCAG compliant out of the box with keyboard navigation</li>
+      <li><strong>TypeScript</strong>: Full type safety and IntelliSense support</li>
+    </ul>
+
+    <Note>Ideal for user interfaces, dashboards, and modern web applications.</Note>
+  </Accordion>
+</AccordionGroup>
 
 ### Step 2: Installation
 
@@ -40,51 +50,17 @@ Pelatform offers two main categories of tools:
   <Accordion icon="package" title="Install Development Toolkits">
     Install individual toolkits based on your needs:
 
-    <CodeGroup>
-      ```bash npm
-      # Development configs
-      npm install @pelatform/eslint-config @pelatform/tsconfig @pelatform/biome-config
+    <PackageInstaller
+      command="
+    # Development configs
+    installer @pelatform/eslint-config @pelatform/tsconfig @pelatform/biome-config
 
-      # Utilities and helpers
-      npm install @pelatform/utils
+    # Utilities and helpers
+    installer @pelatform/utils
 
-      # Email and storage
-      npm install @pelatform/email @pelatform/storage
-      ```
-
-      ```bash yarn
-      # Development configs
-      yarn add @pelatform/eslint-config @pelatform/tsconfig @pelatform/biome-config
-
-      # Utilities and helpers
-      yarn add @pelatform/utils
-
-      # Email and storage
-      yarn add @pelatform/email @pelatform/storage
-      ```
-
-      ```bash pnpm
-      # Development configs
-      pnpm add @pelatform/eslint-config @pelatform/tsconfig @pelatform/biome-config
-
-      # Utilities and helpers
-      pnpm add @pelatform/utils
-
-      # Email and storage
-      pnpm add @pelatform/email @pelatform/storage
-      ```
-
-      ```bash bun
-      # Development configs
-      bun add @pelatform/eslint-config @pelatform/tsconfig @pelatform/biome-config
-
-      # Utilities and helpers
-      bun add @pelatform/utils
-
-      # Email and storage
-      bun add @pelatform/email @pelatform/storage
-      ```
-    </CodeGroup>
+    # Email and storage
+    installer @pelatform/email @pelatform/storage
+    " />
 
     <Tip>Choose only the packages you need to minimize bundle size.</Tip>
   </Accordion>
@@ -92,40 +68,15 @@ Pelatform offers two main categories of tools:
   <Accordion icon="box" title="Install UI Components">
     Install the complete UI library or individual packages:
 
-    <CodeGroup>
-      ```bash npm
-      # Complete UI library
-      npm install pelatform-ui react react-dom
+    <PackageInstaller
+      command="
+    # Complete UI library
+    installer pelatform-ui react react-dom
 
-      # Or install specific packages
-      npm install @pelatform/ui.base @pelatform/ui.default @pelatform/ui.animation
-      ```
-
-      ```bash yarn
-      # Complete UI library
-      yarn add pelatform-ui react react-dom
-
-      # Or install specific packages
-      yarn add @pelatform/ui.base @pelatform/ui.default @pelatform/ui.animation
-      ```
-
-      ```bash pnpm
-      # Complete UI library
-      pnpm add pelatform-ui react react-dom
-
-      # Or install specific packages
-      pnpm add @pelatform/ui.base @pelatform/ui.default @pelatform/ui.animation
-      ```
-
-      ```bash bun
-      # Complete UI library
-      bun add pelatform-ui react react-dom
-
-      # Or install specific packages
-      bun add @pelatform/ui.base @pelatform/ui.default @pelatform/ui.animation
-      ```
-    </CodeGroup>
-
+    # Or install specific packages
+    installer @pelatform/ui.base @pelatform/ui.default @pelatform/ui.animation
+    " />
+    
     <Note>UI components require React 18+ and have peer dependencies like Radix UI and TailwindCSS.</Note>
   </Accordion>
 </AccordionGroup>
@@ -136,8 +87,7 @@ Pelatform offers two main categories of tools:
   <Accordion icon="code" title="Set Up Development Environment">
     Configure your development environment with Pelatform tools:
 
-    ```typescript
-    // eslint.config.js
+    ```js eslint.config.js
     import pelatform from '@pelatform/eslint-config';
 
     export default [
@@ -148,8 +98,9 @@ Pelatform offers two main categories of tools:
         }
       }
     ];
+    ```
 
-    // tsconfig.json
+    ```json tsconfig.json
     {
       "extends": "@pelatform/tsconfig/base.json",
       "compilerOptions": {
@@ -163,7 +114,7 @@ Pelatform offers two main categories of tools:
   <Accordion icon="sparkles" title="Create Your First Component">
     Start building with Pelatform UI components:
 
-    ```typescript
+    ```typescript MyComponent.tsx
     import { Button, Card, Input, Form } from "pelatform-ui";
 
     function MyComponent() {

@@ -1,0 +1,495 @@
+---
+title: 'TypeScript'
+description: 'Common TypeScript configuration files for various environments including Node.js, React, Next.js, Bun, and Cloudflare Workers'
+keywords: ["typescript", "tsconfig", "configuration", "nodejs", "react", "nextjs", "bun", "cloudflare"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/tsconfig.svg)](https://www.npmjs.com/package/@pelatform/tsconfig)
+
+Collection of TypeScript configuration files optimized for different environments and runtimes. Each configuration file provides best practices with minimal setup.
+
+<Card title="Multi-Environment Support" icon="layers">
+  <ul>
+    <li><strong>Base Configuration</strong>: Core TypeScript settings with strict mode</li>
+    <li><strong>React Applications</strong>: Optimized for React development with JSX support</li>
+    <li><strong>Next.js Projects</strong>: Specialized configuration for Next.js development</li>
+    <li><strong>Node.js Runtime</strong>: Server-side TypeScript with Node.js types</li>
+    <li><strong>Bun Runtime</strong>: Modern JavaScript runtime with Bun-specific types</li>
+    <li><strong>Cloudflare Workers</strong>: Edge computing with Workers types</li>
+  </ul>
+</Card>
+
+<Card title="Strict Type Safety" icon="shield-check">
+  <ul>
+    <li><strong>Enhanced Type Checking</strong>: Strict mode with comprehensive type rules</li>
+    <li><strong>Modern ES Features</strong>: Support for ES2022 and modern JavaScript</li>
+    <li><strong>Module Resolution</strong>: Optimal module resolution for bundlers</li>
+    <li><strong>Declaration Generation</strong>: Automatic `.d.ts` file generation</li>
+  </ul>
+</Card>
+
+<Card title="Performance Optimized" icon="zap">
+  <ul>
+    <li><strong>Incremental Compilation</strong>: Faster rebuilds with incremental mode</li>
+    <li><strong>Skip Lib Check</strong>: Faster compilation with library type skipping</li>
+    <li><strong>Optimized Targets</strong>: Modern JavaScript target for better performance</li>
+  </ul>
+</Card>
+
+## Installation
+
+<PackageInstaller command="installer -D @pelatform/tsconfig typescript" />
+
+<Note>
+TypeScript is a peer dependency. Install the version that suits your project requirements.
+</Note>
+
+## Available Configurations
+
+<Tabs>
+  <Tab title="Base Configuration">
+    <h4>tsconfig.base.json</h4>
+    <Info>Base configuration for all TypeScript projects</Info>
+
+    ```json tsconfig.json
+    {
+      "extends": "@pelatform/tsconfig/base",
+      "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "dist"
+      },
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist"]
+    }
+    ```
+
+    <Check>
+      ✅ Strict mode enabled<br/>
+      ✅ ES2022 target<br/>
+      ✅ Modern module resolution<br/>
+      ✅ Declaration generation<br/>
+      ✅ Source maps support
+    </Check>
+  </Tab>
+
+  <Tab title="Browser Applications">
+    <h4>tsconfig.dom.json</h4>
+    <Info>Browser-based applications</Info>
+
+    ```json tsconfig.json
+    {
+      "extends": "@pelatform/tsconfig/dom"
+    }
+    ```
+
+    <Check>
+      ✅ DOM library types<br/>
+      ✅ DOM iterable types<br/>
+      ✅ ESNext features<br/>
+      ✅ Browser environment support
+    </Check>
+  </Tab>
+
+  <Tab title="React Applications">
+    <h4>tsconfig.react.json</h4>
+    <Info>React applications</Info>
+
+    ```json tsconfig.json
+    {
+      "extends": "@pelatform/tsconfig/react"
+    }
+    ```
+
+    <Check>
+      ✅ JSX transform support<br/>
+      ✅ React-specific optimizations<br/>
+      ✅ No emission for development<br/>
+      ✅ ESNext target
+    </Check>
+  </Tab>
+
+  <Tab title="Next.js Applications">
+    <h4>tsconfig.next.json</h4>
+    <Info>Next.js applications</Info>
+
+    ```json tsconfig.json
+    {
+      "extends": "@pelatform/tsconfig/next"
+    }
+    ```
+
+    <Check>
+      ✅ Next.js plugin support<br/>
+      ✅ JSX preserve mode<br/>
+      ✅ Next.js environment types<br/>
+      ✅ Optimized for Next.js build system
+    </Check>
+  </Tab>
+
+  <Tab title="Server Runtime">
+    <h4>Node.js Applications</h4>
+    <Info>Node.js applications</Info>
+
+    ```json tsconfig.json
+    {
+      "extends": "@pelatform/tsconfig/node"
+    }
+    ```
+
+    <h4>Bun Applications</h4>
+    <Info>Bun runtime applications</Info>
+
+    ```json tsconfig.json
+    {
+      "extends": "@pelatform/tsconfig/bun"
+    }
+    ```
+
+    <Check>
+      ✅ Runtime-specific type definitions<br/>
+      ✅ Server-side optimizations<br/>
+      ✅ Modern runtime features<br/>
+      ✅ Web API compatibility
+    </Check>
+  </Tab>
+
+  <Tab title="Edge Computing">
+    <h4>tsconfig.cf.json</h4>
+    <Info>Cloudflare Workers</Info>
+
+    ```json tsconfig.json
+    {
+      "extends": "@pelatform/tsconfig/cf"
+    }
+    ```
+
+    <Check>
+      ✅ Cloudflare Workers types<br/>
+      ✅ Edge computing optimizations<br/>
+      ✅ Web APIs support<br/>
+      ✅ Minimal runtime overhead
+    </Check>
+  </Tab>
+</Tabs>
+
+## Quick Start
+
+<Steps>
+  <Step title="Create Project tsconfig.json">
+    Create a `tsconfig.json` file in your project root:
+
+    ```json tsconfig.json
+    {
+      "$schema": "https://json.schemastore.org/tsconfig.json",
+      "extends": "@pelatform/tsconfig/base"
+    }
+    ```
+  </Step>
+
+  <Step title="Add Scripts to package.json">
+    Add build scripts to your `package.json`:
+
+    ```json package.json
+    {
+      "scripts": {
+        "build": "tsc",
+        "build:watch": "tsc --watch",
+        "type-check": "tsc --noEmit"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Configure Your Project">
+    Customize the configuration for your project:
+
+    ```json tsconfig.json
+    {
+      "$schema": "https://json.schemastore.org/tsconfig.json",
+      "extends": "@pelatform/tsconfig/base",
+      "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "dist"
+      },
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist"]
+    }
+    ```
+
+    <Tip>
+      Use schema validation for autocomplete and error checking in your editor.
+    </Tip>
+  </Step>
+</Steps>
+
+## Examples
+
+### React Application
+
+```json tsconfig.json
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "@pelatform/tsconfig/react",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/utils/*": ["./src/utils/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "vite-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
+```
+
+### Next.js Application
+
+```json tsconfig.json
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "@pelatform/tsconfig/next",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/app/*": ["./src/app/*"]
+    }
+  },
+  "plugins": [
+    {
+      "name": "next"
+    }
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+```
+
+### Node.js API
+
+```json tsconfig.json
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "@pelatform/tsconfig/node",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/types/*": ["./src/types/*"]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
+```
+
+### Library Package
+
+```json tsconfig.json
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "@pelatform/tsconfig/base",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "moduleResolution": "bundler"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}
+```
+
+## Advanced Configuration
+
+<Accordion title="Custom Path Mapping">
+  Configure custom path aliases for cleaner imports:
+
+  ```json tsconfig.json
+  {
+    "extends": "@pelatform/tsconfig/base",
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["./src/*"],
+        "@/components/*": ["./src/components/*"],
+        "@/lib/*": ["./src/lib/*"],
+        "@/types/*": ["./src/types/*"],
+        "@/utils/*": ["./src/utils/*"],
+        "@/hooks/*": ["./src/hooks/*"]
+      }
+    }
+  }
+  ```
+</Accordion>
+
+<Accordion title="Multiple Environments">
+  Use different configurations for development and production:
+
+  ```json tsconfig.build.json
+  {
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "noEmit": false,
+      "declaration": true,
+      "declarationMap": true,
+      "sourceMap": true
+    },
+    "include": ["src/**/*"],
+    "exclude": ["**/*.test.*", "**/*.spec.*"]
+  }
+  ```
+
+  ```json tsconfig.test.json
+  {
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "noEmit": true,
+      "types": ["jest", "node"]
+    },
+    "include": [
+      "src/**/*",
+      "**/*.test.*",
+      "**/*.spec.*"
+    ]
+  }
+  ```
+</Accordion>
+
+## Troubleshooting
+
+### Common Issues
+
+<Tabs>
+  <Tab title="Module Resolution">
+    ```json tsconfig.json
+    {
+      "compilerOptions": {
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": false,
+        "allowSyntheticDefaultImports": true
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Path Aliases">
+    ```json tsconfig.json
+    {
+      "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+          "@/*": ["./src/*"]
+        }
+      },
+      "include": ["src/**/*"]
+    }
+    ```
+  </Tab>
+
+  <Tab title="Declaration Files">
+    ```json
+    {
+      "compilerOptions": {
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": false
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="JSX Issues">
+    ```json
+    {
+      "compilerOptions": {
+        "jsx": "react-jsx",
+        "lib": ["DOM", "ES2022"]
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+### Project Organization
+
+<Tree>
+  <Tree.Folder name="project" defaultOpen>
+    <Tree.Folder name="src" defaultOpen>
+      <Tree.Folder name="components" />
+      <Tree.Folder name="lib" />
+      <Tree.Folder name="types" />
+      <Tree.Folder name="utils" />
+    </Tree.Folder>
+    <Tree.Folder name="tests" />
+    <Tree.File name="tsconfig.json" />
+    <Tree.File name="tsconfig.build.json" />
+    <Tree.File name="tsconfig.test.json" />
+    <Tree.File name="package.json" />
+  </Tree.Folder>
+</Tree>
+
+### Type Definition Files
+
+```typescript src/types/global.d.ts
+declare global {
+  interface Window {
+    gtag: (command: string, targetId: string, config?: any) => void;
+  }
+}
+
+export {};
+```
+
+### Library Publishing
+
+```json tsconfig.json
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "verbatimModuleSyntax": true
+  }
+}
+```

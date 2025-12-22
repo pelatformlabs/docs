@@ -1,0 +1,467 @@
+---
+title: 'ESLint React'
+description: 'ESLint configuration for React projects with TypeScript, React Hooks, JSX accessibility, and TanStack Query integration'
+keywords: ["eslint", "react", "typescript", "jsx", "react-hooks", "tanstack-query", "accessibility"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+import { PackageRun } from '/snippets/packagerun.jsx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/eslint-config-react.svg)](https://www.npmjs.com/package/@pelatform/eslint-config-react)
+
+Comprehensive ESLint configuration specifically designed for React projects. This package extends the base ESLint config with React-specific rules, hooks validation, JSX accessibility, and TanStack Query linting support.
+
+<Card title="React Best Practices" icon="react">
+  Complete React ruleset with hooks validation, JSX runtime support, and TypeScript integration
+</Card>
+
+<Card title="TanStack Query" icon="database">
+  Built-in linting for TanStack Query with best practices and optimization rules
+</Card>
+
+<Card title="Accessibility Guidance" icon="braces">
+  Recommended accessibility practices for React components; add `eslint-plugin-jsx-a11y` if needed
+</Card>
+
+## Installation
+
+Install the package and its peer dependencies:
+
+<PackageInstaller command="installer -D @pelatform/eslint-config-react eslint typescript" />
+
+<Note>
+This package requires ESLint 9.30.0 or greater and automatically includes `@pelatform/eslint-config` as a dependency.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="Create ESLint Config">
+    Create an `eslint.config.js` file in your project root:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config-react";
+
+    export default [
+      ...configs.reactFast,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+  </Step>
+
+  <Step title="Add Scripts to package.json">
+    Add lint and lint:fix scripts to your package.json:
+
+    ```json package.json
+    {
+      "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Run Linting">
+    Test your configuration:
+
+    <PackageRun command="run lint" />
+  </Step>
+</Steps>
+
+## Configuration
+
+<Tabs>
+  <Tab title="React Fast">
+    Optimized for performance with Biome formatter:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config-react";
+
+    export default [
+      ...configs.reactFast,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+
+    <Tip>
+      Use with `@pelatform/biome-config` for best results.
+    </Tip>
+  </Tab>
+
+  <Tab title="React Full">
+    Complete configuration with comprehensive rules:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config-react";
+
+    export default [
+      ...configs.reactFull,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+
+    <Info>
+      Both configs include the same React-specific rules.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Features
+
+### React Integration
+
+- **React Best Practices**: Enforces React recommended rules and conventions
+- **JSX Runtime**: Configured for modern React with JSX transform support
+- **React Hooks**: Complete hooks validation with latest rules
+- **TypeScript Support**: Full TypeScript integration for React components
+- **Prop Validation**: TypeScript-based prop validation (prop-types disabled)
+
+### TanStack Query Support
+
+- **Query Best Practices**: Validates TanStack Query usage patterns
+- **Cache Management**: Ensures proper cache and query key management
+- **Optimization Rules**: Promotes efficient data fetching patterns
+- **Error Handling**: Encourages proper error handling in queries
+
+### Accessibility
+
+- **Guidance**: Accessibility best practices for React
+- **Optional Plugin**: Install `eslint-plugin-jsx-a11y` for strict JSX accessibility rules
+
+### CSS-in-JS Support
+
+- **Tailwind Integration**: Built-in support for Tailwind CSS classes
+- **Twin Macro**: Compatible with Twin Macro for styled-components
+- **CSS Props**: Validates CSS prop usage in React components
+
+## Advanced Setup
+
+<Accordion title="Custom React Rules">
+  Override React-specific rules:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config-react";
+
+  export default [
+    ...configs.reactFast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+      rules: {
+        "react/prop-types": "off",
+        "react/no-unknown-property": ["error", {
+          ignore: ["css", "tw", "vaul-drawer-wrapper"]
+        }],
+        "react/jsx-uses-react": "off",
+        "react/react-in-jsx-scope": "off",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+<Accordion title="Framework-Specific Rules">
+  Configure for specific React frameworks:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config-react";
+
+  export default [
+    ...configs.reactFast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+    },
+    {
+      files: ["**/*.stories.tsx"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+        "react-hooks/rules-of-hooks": "off",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+<Accordion title="TanStack Query Rules">
+  Configure TanStack Query rules:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config-react";
+
+  export default [
+    ...configs.reactFast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+    },
+    {
+      files: ["**/queries/**/*.ts", "**/hooks/**/*.ts"],
+      rules: {
+        "@tanstack/query/exhaustive-deps": "error",
+        "@tanstack/query/prefer-query-object-syntax": "error",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+## Dependencies
+
+### Required
+- **eslint**: `>=9.30.0` - Core linting engine
+- **typescript**: Type checking and parser support
+
+### Included
+- **@pelatform/eslint-config**: Base ESLint configuration
+- **@tanstack/eslint-plugin-query**: TanStack Query linting rules
+- **eslint-plugin-react**: React-specific linting rules
+- **eslint-plugin-react-hooks**: React Hooks validation
+- **typescript-eslint**: TypeScript-specific rules
+
+## Rules Overview
+
+### React Rules
+
+<Tabs>
+  <Tab title="Core React">
+    - `react/react-in-jsx-scope`: Disabled (JSX transform)
+    - `react/prop-types`: Disabled (TypeScript validation)
+    - `react/jsx-uses-react`: Disabled (JSX transform)
+    - `react/jsx-uses-vars`: Prevent unused JSX variables
+    - `react/jsx-key`: Validate keys in lists
+  </Tab>
+  <Tab title="Hooks">
+    - `react-hooks/rules-of-hooks`: Validate hooks usage rules
+    - `react-hooks/exhaustive-deps`: Validate useEffect dependencies
+    - `react-hooks/react-compiler`: Future-proof for React compiler
+  </Tab>
+  <Tab title="Accessibility (optional)">
+    - Requires `eslint-plugin-jsx-a11y` (not included by default)
+    - Common rules: `jsx-a11y/anchor-is-valid`, `jsx-a11y/alt-text`, `jsx-a11y/aria-role`
+  </Tab>
+</Tabs>
+
+### TanStack Query Rules
+
+- **@tanstack/query/no-rest-destructuring**: Prevent rest destructuring in queries
+- **@tanstack/query/prefer-query-object-syntax**: Prefer object syntax
+- **@tanstack/query/stable-query-client**: Ensure stable query client usage
+
+## Examples
+
+### Basic React
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-react";
+import globals from "globals";
+
+export default [
+  ...configs.reactFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+];
+```
+
+### Next.js App Router
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-react";
+import globals from "globals";
+
+export default [
+  ...configs.reactFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+        project: "./tsconfig.json",
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+  },
+];
+```
+
+### React Native
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-react";
+
+export default [
+  ...configs.reactFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+      globals: {
+        ...globals.node,
+      },
+    },
+    settings: {
+      react: {
+        version: "detect",
+        pragma: "React",
+        flowVersion: "0.0",
+      },
+    },
+  },
+];
+```
+
+### Component Library
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-react";
+
+export default [
+  ...configs.reactFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ["src/components/**/*.tsx"],
+    rules: {
+      "react/prop-types": "off",
+      "react/no-unknown-property": ["error", {
+        ignore: ["css", "tw", "styled"]
+      }],
+    },
+  },
+];
+```
+
+## Framework Support
+
+### Next.js
+
+Standard React configuration works with Next.js:
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-react";
+
+export default [
+  ...configs.reactFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+];
+```
+
+### Remix
+
+Use standard React configuration for Remix projects.
+
+### Vite
+
+Consider using `@pelatform/eslint-config-vite` for Vite + React projects.
+
+## Troubleshooting
+
+<Accordion title="React Version Detection">
+  Set explicit React version if auto-detection fails:
+
+  ```js
+  {
+    settings: {
+      react: {
+        version: "18.0",
+      },
+    },
+  }
+  ```
+</Accordion>
+
+<Accordion title="JSX Parsing Errors">
+  Ensure JSX is configured for your file types:
+
+  ```js
+  {
+    files: ["**/*.tsx"],
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+  }
+  ```
+</Accordion>
+
+<Accordion title="TanStack Query Rules">
+  Rules only apply to files importing the library:
+
+  ```js
+  {
+    files: ["**/queries/**/*.ts", "**/hooks/**/*.ts"],
+    // TanStack Query rules automatically applied
+  }
+  ```
+</Accordion>
+
+## Biome Integration
+
+1. Install Biome:
+
+<PackageInstaller command="installer -D @pelatform/biome-config @biomejs/biome" />
+
+2. Create Biome config:
+
+```jsonc biome.jsonc
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["@pelatform/biome-config/base"]
+}
+```
+
+3. Use the `reactFast` configuration
+
+<Check>
+All React-specific rules are preserved in fast mode since Biome doesn't have equivalents for React hooks, JSX accessibility, or TanStack Query linting.
+</Check>

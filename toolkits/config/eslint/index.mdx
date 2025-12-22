@@ -1,0 +1,360 @@
+---
+title: 'ESLint'
+description: 'Common ESLint configuration for modern TypeScript projects with strict type checking and comprehensive linting rules'
+keywords: ["eslint", "typescript", "linting", "configuration", "code-quality", "eslint9"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+import { PackageRun } from '/snippets/packagerun.jsx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/eslint-config.svg)](https://www.npmjs.com/package/@pelatform/eslint-config)
+
+Comprehensive ESLint configuration designed for modern TypeScript projects. This package provides strict type checking, comprehensive linting rules, and seamless integration with Turborepo.
+
+<Card title="Strict TypeScript" icon="file-type">
+  Type-aware ESLint configuration with strict type checking and comprehensive TypeScript rules
+</Card>
+
+<Card title="Turborepo Ready" icon="zap">
+  Pre-configured for monorepo environments with Turborepo integration and optimized performance
+</Card>
+
+<Card title="Modern ESLint 9" icon="shield-check">
+  Built on ESLint 9.x with flat config system for better configuration management and performance
+</Card>
+
+## Installation
+
+Install the package and its peer dependencies:
+
+<PackageInstaller command="installer -D @pelatform/eslint-config eslint typescript" />
+
+<Note>
+This package requires ESLint 9.30.0 or greater since it uses the flat config system.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="Create ESLint Config">
+    Create an `eslint.config.js` file in your project root:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config";
+
+    export default [
+      ...configs.fast,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+  </Step>
+
+  <Step title="Add Scripts to package.json">
+    Add lint and lint:fix scripts to your package.json:
+
+    ```json package.json
+    {
+      "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Run Linting">
+    Test your configuration:
+
+    <PackageRun command="run lint" />
+  </Step>
+</Steps>
+
+## Configuration
+
+<Tabs>
+  <Tab title="Fast Config">
+    Optimized for performance with Biome formatter:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config";
+
+    export default [
+      ...configs.fast,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+
+    <Tip>
+      Use with `@pelatform/biome-config` for best results.
+    </Tip>
+  </Tab>
+
+  <Tab title="Base Config">
+    Full configuration with comprehensive rules:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config";
+
+    export default [
+      ...configs.base,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+
+    <Info>
+      Both configs are identical. Use `fast` for Biome integration.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Features
+
+### TypeScript Integration
+
+- **Strict Type Checking**: Full TypeScript support with type-aware linting
+- **Modern Syntax**: Supports latest ECMAScript features and TypeScript syntax
+- **Project Service**: Automatic TypeScript project detection and configuration
+- **File-specific Rules**: Different rules for different file types (CJS, MJS, TSX)
+
+### Linting Rules
+
+- **Code Quality**: Comprehensive rules for maintainable and error-free code
+- **Best Practices**: Industry-standard coding conventions
+- **Security**: Security-focused rules to prevent common vulnerabilities
+- **Performance**: Rules that promote efficient code patterns
+
+### Monorepo Support
+
+- **Turborepo Integration**: Pre-configured for Turborepo environments
+- **Global Ignores**: Intelligent file ignoring for build artifacts and dependencies
+- **Cross-repo Consistency**: Standardized linting across multiple packages
+
+## Advanced Setup
+
+<Accordion title="Custom Rules">
+  Override specific rules:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config";
+
+  export default [
+    ...configs.fast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+      rules: {
+        "@typescript-eslint/explicit-member-accessibility": "off",
+        "prefer-const": "error",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+<Accordion title="File-Specific Rules">
+  Configure rules for specific file patterns:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config";
+
+  export default [
+    ...configs.fast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+    },
+    {
+      files: ["**/*.test.ts", "**/*.spec.ts"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+<Accordion title="Biome Integration">
+  Combine with Biome for optimal performance:
+
+  1. Install Biome:
+
+  <PackageInstaller command="installer -D @pelatform/biome-config @biomejs/biome" />
+
+  2. Create Biome config:
+  ```jsonc biome.jsonc
+  {
+    "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+    "extends": ["@pelatform/biome-config/base"]
+  }
+  ```
+
+  3. Use the fast ESLint configuration
+</Accordion>
+
+## File Handling
+
+<Tabs>
+  <Tab title="TypeScript">
+    - `.ts`, `.tsx`, `.mts`, `.mtsx`
+    - Full type checking enabled
+    - Strict TypeScript rules
+  </Tab>
+  <Tab title="JavaScript">
+    - `.js`, `.jsx`, `.mjs`, `.cjs`
+    - Syntax checking without types
+    - Modern JavaScript rules
+  </Tab>
+  <Tab title="Config Files">
+    - `eslint.config.*`, `tailwind.config.*`
+    - Node.js globals available
+    - Relaxed type checking
+  </Tab>
+</Tabs>
+
+## Dependencies
+
+### Required
+- **eslint**: `>=9.30.0` - Core linting engine
+- **typescript**: Type checking and parser support
+
+### Included
+- **@eslint/js**: Base ESLint configuration
+- **@typescript-eslint/parser**: TypeScript parser
+- **typescript-eslint**: TypeScript-specific rules
+- **eslint-config-turbo**: Turborepo configurations
+- **globals**: Global variable definitions
+
+## Examples
+
+### Basic Setup
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config";
+
+export default [
+  ...configs.fast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+];
+```
+
+### Monorepo
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config";
+
+export default [
+  ...configs.fast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+        project: ["./tsconfig.json", "./packages/*/tsconfig.json"],
+      },
+    },
+  },
+];
+```
+
+### Next.js
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config";
+import globals from "globals";
+
+export default [
+  ...configs.fast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+        project: "./tsconfig.json",
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+  },
+];
+```
+
+## Troubleshooting
+
+<Accordion title="TypeScript Project Not Found">
+  Ensure `tsconfig.json` is in the same directory as `eslint.config.js`:
+
+  ```js
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  }
+  ```
+</Accordion>
+
+<Accordion title="Type Checking Errors">
+  Disable type-aware linting for non-strict projects:
+
+  ```js
+  import { configs } from "@pelatform/eslint-config";
+  import tsParser from "@typescript-eslint/parser";
+
+  export default [
+    ...configs.fast,
+    {
+      files: ["**/*.{js,ts}"],
+      languageOptions: {
+        parser: tsParser,
+        parserOptions: {
+          project: false,
+        },
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+## Migration
+
+From legacy `.eslintrc` configuration:
+
+1. Upgrade to ESLint 9.x
+2. Replace `.eslintrc` with `eslint.config.js`
+3. Use the new flat config format
+4. Remove deprecated settings and plugins
+
+<Check>
+The new flat config system provides better performance and improved TypeScript integration.
+</Check>

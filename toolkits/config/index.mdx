@@ -1,0 +1,230 @@
+---
+title: 'Overview'
+description: 'Development configuration packages including ESLint, TypeScript, and Biome for modern TypeScript projects'
+keywords: ["config", "eslint", "typescript", "biome", "tsconfig", "linting", "formatting", "code-quality"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+import { PackageRun } from '/snippets/packagerun.jsx';
+
+Pelatform Configuration provides development environment setups with ESLint, TypeScript, and Biome configurations optimized for modern TypeScript projects.
+
+<Card title="Development Configs" icon="settings">
+  <ul>
+    <li><strong>ESLint Configurations</strong>: Modern JavaScript/TypeScript linting with React support</li>
+    <li><strong>TypeScript Configs</strong>: Optimized TypeScript configurations for different environments</li>
+    <li><strong>Biome Config</strong>: Fast formatting and linting with modern tooling</li>
+    <li><strong>Zero Setup</strong>: Works out of the box with sensible defaults</li>
+  </ul>
+</Card>
+
+<Card title="Modern Standards" icon="zap">
+  <ul>
+    <li><strong>TypeScript First</strong>: Optimized for TypeScript development</li>
+    <li><strong>React Support</strong>: Built-in React best practices and hooks</li>
+    <li><strong>Performance</strong>: Fast linting and formatting with minimal overhead</li>
+    <li><strong>Editor Integration</strong>: VS Code, WebStorm, and other editor support</li>
+  </ul>
+</Card>
+
+<Card title="Team Consistency" icon="users">
+  <ul>
+    <li><strong>Consistent Style</strong>: Ensures consistent code style across teams</li>
+    <li><strong>Auto-formatting</strong>: Automatic code formatting on save</li>
+    <li><strong>Import Organization</strong>: Automatic import sorting and grouping</li>
+    <li><strong>CI/CD Ready</strong>: Easy integration with GitHub Actions</li>
+  </ul>
+</Card>
+
+## Available Configurations
+
+<Columns cols={2}>
+  <Card title="Biome" icon="brush" href="/toolkits/config/biome">
+    Modern formatting and linting configuration with Biome
+  </Card>
+
+  <Card title="ESLint (Base)" icon="shield-check" href="/toolkits/config/eslint">
+    Common ESLint configuration for modern TypeScript projects
+  </Card>
+
+  <Card title="ESLint React" icon="react" href="/toolkits/config/eslint/react">
+    React-focused ESLint rules with hooks and TypeScript integration
+  </Card>
+
+  <Card title="ESLint Vite" icon="zap" href="/toolkits/config/eslint/vite">
+    Vite-specific ESLint configuration with React Refresh and Router rules
+  </Card>
+
+  <Card title="TypeScript" icon="code" href="/toolkits/config/tsconfig">
+    TypeScript configuration files for different environments and runtimes
+  </Card>
+</Columns>
+
+## Quick Start
+
+<Steps>
+  <Step title="Install Configurations">
+    Install the configuration packages you need:
+
+    <PackageInstaller command="
+    # TypeScript configuration
+    installer -D @pelatform/tsconfig typescript
+
+    # Biome configuration
+    installer -D @pelatform/biome-config @biomejs/biome
+
+    # ESLint configuration
+    installer -D @pelatform/eslint-config eslint
+    " />
+  </Step>
+
+  <Step title="Configure TypeScript">
+    Create your `tsconfig.json`:
+
+    ```json tsconfig.json
+    {
+      "$schema": "https://json.schemastore.org/tsconfig.json",
+      "extends": "@pelatform/tsconfig/base"
+    }
+    ```
+  </Step>
+
+  <Step title="Configure Biome">
+    Create your `biome.jsonc`:
+
+    ```jsonc biome.jsonc
+    {
+      "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+      "extends": ["@pelatform/biome-config/base"]
+    }
+    ```
+  </Step>
+
+  <Step title="Add Scripts">
+    Add build scripts to your `package.json`:
+
+    ```json package.json
+    {
+      "scripts": {
+        "build": "tsc",
+        "type-check": "tsc --noEmit",
+        "format": "biome format --write",
+        "lint": "biome lint",
+        "lint:fix": "biome lint --write"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Run Checks">
+    Execute common tasks:
+
+    <PackageRun command="run type-check" />
+    <PackageRun command="run lint" />
+    <PackageRun command="run lint:fix" />
+    <PackageRun command="run format" />
+  </Step>
+</Steps>
+
+## Usage Examples
+
+### React Application
+
+```json tsconfig.json
+{
+  "extends": "@pelatform/tsconfig/react",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"]
+    }
+  }
+}
+```
+
+  ```jsonc biome.jsonc
+  {
+    "extends": ["@pelatform/biome-config/base"],
+    "files": {
+      "ignore": [".next/**/*", "out/**/*"]
+    }
+  }
+  ```
+
+### Node.js API
+
+```json tsconfig.json
+{
+  "extends": "@pelatform/tsconfig/node",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  }
+}
+```
+
+```jsonc biome.jsonc
+{
+  "extends": ["@pelatform/biome-config/base"],
+  "javascript": {
+    "globals": ["Buffer", "process", "global"]
+  }
+}
+```
+
+### Library Package
+
+```json tsconfig.json
+{
+  "extends": "@pelatform/tsconfig/base",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "moduleResolution": "bundler"
+  }
+}
+```
+
+## Integration with Development Tools
+
+### VS Code Setup
+
+```json .vscode/settings.json
+{
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative"
+}
+```
+
+### GitHub Actions
+
+```yaml .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run type-check
+      - run: biome check
+```
+
+## Related Documentation
+
+- [Email Toolkit](/toolkits/email) - Email sending and templates
+- [Storage Toolkit](/toolkits/storage) - File storage and management
+- [Utils Toolkit](/toolkits/utils) - Utility functions for development
+
+---
+
+Complete development environment setup with TypeScript, ESLint, and Biome configurations for modern projects.

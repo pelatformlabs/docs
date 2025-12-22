@@ -1,0 +1,571 @@
+---
+title: 'ESLint Vite'
+description: 'ESLint configuration for Vite projects with React, React Refresh, TanStack Router, and comprehensive build tool integration'
+keywords: ["eslint", "vite", "react", "react-refresh", "tanstack-router", "typescript", "build-tools"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+import { PackageRun } from '/snippets/packagerun.jsx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/eslint-config-vite.svg)](https://www.npmjs.com/package/@pelatform/eslint-config-vite)
+
+Comprehensive ESLint configuration specifically designed for Vite projects. This package extends the React ESLint config with Vite-specific optimizations, React Refresh support for HMR, and TanStack Router integration.
+
+<Card title="Vite Integration" icon="zap">
+  Optimized for Vite with React Refresh HMR support and build tool-specific rules
+</Card>
+
+<Card title="TanStack Router" icon="route">
+  Built-in linting for TanStack Router with best practices and route validation
+</Card>
+
+<Card title="Hot Module Replacement" icon="refresh-cw">
+  React Refresh rules ensuring seamless development experience with fast refresh
+</Card>
+
+## Installation
+
+Install the package and its peer dependencies:
+
+<PackageInstaller command="installer -D @pelatform/eslint-config-vite eslint typescript" />
+
+<Note>
+This package requires ESLint 9.30.0 or greater and automatically includes `@pelatform/eslint-config-react` as a dependency.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="Create ESLint Config">
+    Create an `eslint.config.js` file in your project root:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config-vite";
+
+    export default [
+      ...configs.viteFast,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+  </Step>
+
+  <Step title="Add Scripts to package.json">
+    Add lint and lint:fix scripts to your package.json:
+
+    ```json package.json
+    {
+      "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Run Linting">
+    Test your configuration:
+
+    <PackageRun command="run lint" />
+  </Step>
+</Steps>
+
+## Configuration
+
+<Tabs>
+  <Tab title="Vite Fast">
+    Optimized for performance with Biome formatter:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config-vite";
+
+    export default [
+      ...configs.viteFast,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+
+    <Tip>
+      Use with `@pelatform/biome-config` for best results.
+    </Tip>
+  </Tab>
+
+  <Tab title="Vite Full">
+    Complete configuration with comprehensive rules:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config-vite";
+
+    export default [
+      ...configs.viteFull,
+      {
+        languageOptions: {
+          parserOptions: {
+            tsconfigRootDir: import.meta.dirname,
+          },
+        },
+      },
+    ];
+    ```
+
+    <Info>
+      Both configs include the same Vite and React-specific rules.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Features
+
+### Vite Integration
+
+- **Build Tool Optimization**: Rules specifically designed for Vite's build system
+- **Environment Variables**: Validation for Vite environment variable usage
+- **Config File Support**: Proper handling of Vite configuration files
+- **Performance Optimization**: Rules that promote fast development and builds
+
+### React Refresh Support
+
+- **HMR Compatibility**: Ensures React components work seamlessly with Hot Module Replacement
+- **Fast Refresh**: Validates proper component export patterns for fast refresh
+- **Development Experience**: Rules that maintain optimal development workflow
+- **Constant Exports**: Allows constant exports alongside React components
+
+### TanStack Router Integration
+
+- **Route Validation**: Comprehensive linting for TanStack Router usage
+- **Type Safety**: Ensures type-safe routing patterns
+- **Best Practices**: Promotes optimal router implementation patterns
+- **Navigation Rules**: Validates proper navigation and route handling
+
+### Complete React Support
+
+Inherits all features from `@pelatform/eslint-config-react`:
+
+- **React Best Practices**: Complete React ruleset with hooks validation
+- **JSX Accessibility**: Strict accessibility rules for React components
+- **TanStack Query**: Built-in linting for TanStack Query
+- **TypeScript Integration**: Full TypeScript support for React components
+
+## Advanced Setup
+
+<Accordion title="Custom Vite Rules">
+  Customize Vite-specific rules:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config-vite";
+
+  export default [
+    ...configs.viteFast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+      rules: {
+        "react-refresh/only-export-components": [
+          "warn",
+          { allowConstantExport: true, allowArrowFunction: false }
+        ],
+        "node/no-process-exit": "off",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+  <Accordion title="Framework-Specific Rules">
+    Configure for specific Vite frameworks:
+
+    ```js eslint.config.js
+    import { configs } from "@pelatform/eslint-config-vite";
+    import globals from "globals";
+
+    export default [
+      ...configs.viteFast,
+      {
+        languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+    },
+    {
+      files: ["**/*.test.tsx", "**/*.spec.tsx"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+        "react-hooks/rules-of-hooks": "off",
+      },
+    },
+    {
+      files: ["vite.config.ts", "vitest.config.ts"],
+      languageOptions: {
+        globals: {
+          ...globals.node,
+        },
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+<Accordion title="TanStack Router">
+  Configure TanStack Router rules:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config-vite";
+
+  export default [
+    ...configs.viteFast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+    },
+    {
+      files: ["**/routes/**/*.ts", "**/router/**/*.ts"],
+      rules: {
+        "@tanstack/router/route-path-segment-casing": "error",
+        "@tanstack/router/route-path-param-case": "error",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+<Accordion title="Environment-Specific">
+  Different rules for different environments:
+
+  ```js eslint.config.js
+  import { configs } from "@pelatform/eslint-config-vite";
+
+  export default [
+    ...configs.viteFast,
+    {
+      languageOptions: {
+        parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
+        },
+      },
+    },
+    {
+      files: ["src/**/*.tsx"],
+      rules: {
+        "react-refresh/only-export-components": "warn",
+      },
+    },
+    {
+      files: ["config/**/*.ts", "scripts/**/*.ts"],
+      rules: {
+        "react-refresh/only-export-components": "off",
+      },
+    },
+  ];
+  ```
+</Accordion>
+
+## Dependencies
+
+### Required
+- **eslint**: `>=9.30.0` - Core linting engine
+- **typescript**: Type checking and parser support
+
+### Included
+- **@pelatform/eslint-config-react**: Base React ESLint configuration
+- **@tanstack/eslint-plugin-router**: TanStack Router linting rules
+- **eslint-plugin-react-refresh**: React Refresh HMR support
+- **typescript-eslint**: TypeScript-specific rules
+
+## Rules Overview
+
+### Vite-Specific Rules
+
+<Tabs>
+  <Tab title="React Refresh">
+    - `react-refresh/only-export-components`: Warn for non-component exports
+    - Allows constant exports with HMR
+    - Ensures proper component structure for fast refresh
+  </Tab>
+  <Tab title="TanStack Router">
+    - `@tanstack/router/route-path-segment-casing`: Validate path segment casing
+    - `@tanstack/router/route-path-param-case`: Validate parameter naming
+    - `@tanstack/router/route-name-prefix`: Ensure consistent route naming
+  </Tab>
+  <Tab title="Environment Variables">
+    - Validates proper usage of Vite environment variables
+    - Ensures type-safe environment variable access
+    - Prevents runtime errors from undefined variables
+  </Tab>
+</Tabs>
+
+### Inherited Rules
+
+All rules from `@pelatform/eslint-config-react` including:
+
+- **React Rules**: Best practices, hooks, accessibility
+- **TanStack Query**: Query optimization and best practices
+- **TypeScript**: Strict type checking and modern syntax
+- **Code Quality**: Comprehensive linting for maintainable code
+
+## Examples
+
+### Basic Vite React
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-vite";
+
+export default [
+  ...configs.viteFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+];
+```
+
+### Vite + TanStack Router
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-vite";
+
+export default [
+  ...configs.viteFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ["src/routes/**/*.ts"],
+    rules: {
+      "@tanstack/router/route-path-param-case": "error",
+      "@tanstack/router/route-path-segment-casing": "error",
+    },
+  },
+];
+```
+
+### Vite + Custom Setup
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-vite";
+import globals from "globals";
+
+export default [
+  ...configs.viteFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        __APP_VERSION__: "readonly",
+      },
+    },
+  },
+];
+```
+
+### Multi-Environment Vite
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-vite";
+
+export default [
+  ...configs.viteFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ["src/**/*.tsx"],
+    rules: {
+      "react-refresh/only-export-components": "warn",
+    },
+  },
+  {
+    files: ["src/**/*.test.tsx", "src/**/*.spec.tsx"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+];
+```
+
+## Framework Support
+
+### Vite + React
+
+Standard Vite React setup:
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-vite";
+
+export default [
+  ...configs.viteFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+];
+```
+
+### Vite + React + TanStack Router
+
+Complete setup with routing:
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-vite";
+
+export default [
+  ...configs.viteFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ["src/routes/**/*"],
+    rules: {
+      "@tanstack/router/route-name-prefix": [
+        "error",
+        { prefix: "Route" }
+      ],
+    },
+  },
+];
+```
+
+### Vite + Storybook
+
+Vite project with Storybook:
+
+```js eslint.config.js
+import { configs } from "@pelatform/eslint-config-vite";
+
+export default [
+  ...configs.viteFast,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ["**/*.stories.tsx"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+      "import/no-extraneous-dependencies": "off",
+    },
+  },
+];
+```
+
+## Development Workflow
+
+### Hot Module Replacement
+
+- **Component Detection**: Validates proper React component exports
+- **Constant Exports**: Allows constant exports alongside components
+- **Fast Refresh**: Maintains state during component updates
+- **Error Prevention**: Prevents HMR-breaking patterns
+
+### Performance Optimization
+
+- **Fast Mode**: Optimized for use with Biome formatter
+- **Build Speed**: Rules that don't slow down Vite's fast builds
+- **Development Experience**: Minimal friction during development
+- **Production Builds**: Comprehensive linting for production code
+
+## Troubleshooting
+
+<Accordion title="React Refresh Issues">
+  Ensure proper component exports:
+
+  ```js
+  // ✅ Default export
+  export default function MyComponent() {
+    return <div>Component</div>;
+  }
+
+  // ✅ Named export with component name
+  export function NamedComponent() {
+    return <div>Component</div>;
+  }
+
+  // ❌ Arrow function without name
+  export const ArrowComponent = () => <div>Component</div>;
+  ```
+</Accordion>
+
+<Accordion title="TanStack Router Rules">
+  Router rules only apply to files importing the library:
+
+  ```js
+  import { createRouter } from '@tanstack/react-router';
+  // Router rules automatically apply
+  ```
+</Accordion>
+
+<Accordion title="Environment Variables">
+  Validate in Vite config:
+
+  ```ts vite.config.ts
+  export default defineConfig({
+    define: {
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+    },
+  });
+  ```
+</Accordion>
+
+## Biome Integration
+
+1. Install Biome:
+
+<PackageInstaller command="installer -D @pelatform/biome-config @biomejs/biome" />
+
+2. Create Biome config:
+
+```jsonc biome.jsonc
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["@pelatform/biome-config/base"]
+}
+```
+
+3. Use the `viteFast` configuration
+
+<Check>
+All Vite and React-specific rules are preserved in fast mode since Biome doesn't have equivalents for React Refresh, TanStack Router, or HMR validation.
+</Check>

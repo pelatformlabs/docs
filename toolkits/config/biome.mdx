@@ -1,0 +1,465 @@
+---
+title: 'Biome'
+description: 'Opinionated Biome configuration for modern TypeScript projects with comprehensive linting and formatting rules'
+keywords: ["biome", "formatter", "linter", "typescript", "code-quality"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/biome-config.svg)](https://www.npmjs.com/package/@pelatform/biome-config)
+
+Opinionated [Biome](https://biomejs.dev) configuration for modern TypeScript projects. Provides a comprehensive setup with formatting, linting, and code organization rules optimized for development experience.
+
+<Card title="Complete Toolchain" icon="layers">
+  <ul>
+    <li><strong>Formatter</strong>: Consistent code formatting across all file types</li>
+    <li><strong>Linter</strong>: Comprehensive linting rules for code quality</li>
+    <li><strong>Import Organization</strong>: Automatic import sorting and grouping</li>
+    <li><strong>VCS Integration</strong>: Git-aware with ignore file support</li>
+  </ul>
+</Card>
+
+<Card title="Modern Standards" icon="zap">
+  <ul>
+    <li><strong>TypeScript First</strong>: Optimized for modern TypeScript projects</li>
+    <li><strong>React Support</strong>: Built-in React best practices and Fast Refresh</li>
+    <li><strong>Performance</strong>: Fast formatting and linting with minimal overhead</li>
+    <li><strong>Extensible</strong>: Easy to customize and extend for specific needs</li>
+  </ul>
+</Card>
+
+<Card title="Developer Experience" icon="smile">
+  <ul>
+    <li><strong>Zero Config</strong>: Works out of the box with sensible defaults</li>
+    <li><strong>Editor Integration</strong>: VS Code, WebStorm, and other editor support</li>
+    <li><strong>CI/CD Ready</strong>: Easy integration with GitHub Actions and other CI systems</li>
+    <li><strong>Team Consistency</strong>: Ensures consistent code style across teams</li>
+  </ul>
+</Card>
+
+## Installation
+
+<PackageInstaller command="installer -D @pelatform/biome-config @biomejs/biome" />
+
+<Note>
+Biome is a peer dependency. Install the version that suits your project requirements.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="Create biome.jsonc">
+    Create a `biome.jsonc` file in your project root:
+
+    ```jsonc biome.jsonc
+    {
+      "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+      "extends": ["@pelatform/biome-config/base"]
+    }
+    ```
+  </Step>
+
+  <Step title="Add Scripts to package.json">
+    Add Biome scripts to your `package.json`:
+
+    ```json package.json
+    {
+      "scripts": {
+        "format": "biome format --write",
+        "lint": "biome lint",
+        "lint:fix": "biome lint --write",
+        "check": "biome check --write"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Configure Your Editor">
+    Install the Biome extension for your editor and enable format on save.
+
+    <Tip>
+      Most editors support Biome natively. Check your editor's documentation for Biome integration.
+    </Tip>
+  </Step>
+</Steps>
+
+## Features
+
+### Core Settings
+
+- **VCS Integration**: Git-aware with automatic ignore file detection
+- **File Inclusion**: Includes all files except build outputs
+- **Unknown Files**: Processes unknown file kinds by default
+
+### Formatting
+
+<Tabs>
+  <Tab title="General">
+    - **Indentation**: 2 spaces
+    - **Line endings**: LF (Unix style)
+    - **Line width**: 100 characters
+    - **Global formatter**: Enabled for all files
+  </Tab>
+
+  <Tab title="JavaScript/TypeScript">
+    - **Quote style**: Double quotes
+    - **Arrow parentheses**: Always
+    - **Bracket spacing**: True
+    - **Semicolons**: Always
+    - **Trailing commas**: All
+  </Tab>
+
+  <Tab title="JSON">
+    - **Indentation**: 2 spaces
+    - **Trailing commas**: None
+    - **Quote style**: Double quotes
+  </Tab>
+
+  <Tab title="HTML & CSS">
+    - **HTML formatter**: Experimental full support
+    - **CSS formatter**: 2-space indent
+    - **CSS quotes**: Double quotes
+    - **Tailwind support**: Enabled
+  </Tab>
+</Tabs>
+
+### Linting Rules
+
+<Tabs>
+  <Tab title="Correctness">
+    - `correctness/noUnusedImports`: Info with safe fix
+    - `correctness/noUnknownTypeSelector`: Off
+    - `correctness/useUniqueElementIds`: Off
+    - `correctness/noUnusedFunctionParameters`: Off
+    - `correctness/useParseIntRadix`: Off
+    - `correctness/useHookAtTopLevel`: Off
+  </Tab>
+
+  <Tab title="Style">
+    - `style/useConst`: Error
+    - `style/useShorthandAssign`: Error
+    - `style/useSingleVarDeclarator`: Error
+    - `style/noNonNullAssertion`: Off
+    - `style/noDescendingSpecificity`: Off
+    - `style/useSelfClosingElements`: Info with safe fix
+    - `style/useTemplate`: Info with safe fix
+  </Tab>
+
+  <Tab title="Suspicious">
+    - `suspicious/noDuplicateProperties`: Off
+    - `suspicious/noUnknownAtRules`: Off
+    - `suspicious/noArrayIndexKey`: Off
+    - `suspicious/noExplicitAny`: Warn
+    - `suspicious/noImplicitAnyLet`: Off
+    - `suspicious/noDoubleEquals`: Warn with safe fix
+  </Tab>
+
+  <Tab title="A11y (disabled)">
+    - Most accessibility checks (`a11y/*`) are turned off by default
+    - Enable selectively if your project requires stricter A11y rules
+  </Tab>
+
+  <Tab title="Nursery">
+    - `nursery/useSortedClasses`: Info; sorts classes for `cn`, `clsx`, `cva`, `tw`
+  </Tab>
+</Tabs>
+
+### Import Organization
+
+Biome automatically organizes imports with this grouping strategy:
+
+1. **Built-in modules**: URL, Node.js, Bun built-ins
+2. **Framework imports**: React, Next.js
+3. **Third-party packages**: External packages
+4. **Internal packages**: `@pelatform/**`, `pelatform-ui`, `@repo/**`
+5. **Path aliases**: Configured path aliases
+6. **Relative paths**: Local file imports
+
+<Check>
+  ✅ Natural identifier order<br/>
+  ✅ Automatic deduplication<br/>
+  ✅ Custom grouping support<br/>
+  ✅ Preserves comments
+</Check>
+
+## Advanced Configuration
+
+<Accordion title="Custom Rules">
+  Override specific rules for your project:
+
+  ```jsonc biome.jsonc
+  {
+    "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+    "extends": ["@pelatform/biome-config/base"],
+    "linter": {
+      "rules": {
+        "style": {
+          "useConst": "off"
+        },
+        "suspicious": {
+          "noExplicitAny": "off"
+        }
+      }
+    }
+  }
+  ```
+</Accordion>
+
+<Accordion title="File-Specific Configuration">
+  Configure different rules for specific file patterns:
+
+  ```jsonc biome.jsonc
+  {
+    "extends": ["@pelatform/biome-config/base"],
+    "files": {
+      "includes": ["src/**/*"],
+      "ignore": ["dist/**/*", "node_modules/**/*"]
+    },
+    "javascript": {
+      "formatter": {
+        "quoteStyle": "single"
+      }
+    }
+  }
+  ```
+</Accordion>
+
+<Accordion title="Custom Ignore Patterns">
+  Ignore specific files or patterns:
+
+  ```jsonc biome.jsonc
+  {
+    "extends": ["@pelatform/biome-config/base"],
+    "files": {
+      "ignore": [
+        "coverage/**/*",
+        "dist/**/*",
+        "**/*.min.js",
+        "generated/**/*"
+      ]
+    }
+  }
+  ```
+</Accordion>
+
+## Examples
+
+### Next.js Project
+
+```jsonc biome.jsonc
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["@pelatform/biome-config/base"],
+  "files": {
+    "ignore": [".next/**/*", "out/**/*"]
+  },
+  "javascript": {
+    "formatter": {
+      "quoteProperties": "asNeeded"
+    }
+  }
+}
+```
+
+### React Library
+
+```jsonc biome.jsonc
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["@pelatform/biome-config/base"],
+  "linter": {
+    "rules": {
+      "style": {
+        "useComponentExportOnlyModules": "error"
+      }
+    }
+  }
+}
+```
+
+### Node.js API
+
+```jsonc biome.jsonc
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["@pelatform/biome-config/base"],
+  "javascript": {
+    "globals": [
+      "Buffer",
+      "process",
+      "global",
+      "__dirname",
+      "__filename"
+    ]
+  }
+}
+```
+
+## CLI Usage
+
+<CodeGroup>
+  ```bash for formatting
+  # Format files
+  biome format --write
+
+  # Lint files
+  biome lint
+
+  # Auto-fix lint issues
+  biome lint --write
+
+  # Check and fix everything
+  biome check --write
+  ```
+
+  ```bash for linting
+  # Check specific file
+  biome check src/index.ts
+
+  # Format specific directory
+  biome format src/
+
+  # Dry run (no changes)
+  biome check --no-errors-on-unmatched
+  ```
+
+  ```bash for configuration
+  # Show configuration
+  biome explain biome.jsonc
+
+  # List enabled rules
+  biome lint rules
+
+  # Verify configuration
+  biome check --config-path ./biome.jsonc
+  ```
+</CodeGroup>
+
+## Integration
+
+### CI/CD
+
+<Accordion title="GitHub Actions">
+  ```yaml .github/workflows/ci.yml
+  name: CI
+  on: [push, pull_request]
+  jobs:
+    check:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: oven-sh/setup-biome@v1
+        - run: biome check
+  ```
+</Accordion>
+
+<Accordion title="Pre-commit Hooks">
+  ```json package.json
+  {
+    "lint-staged": {
+      "*.{js,jsx,ts,tsx,cjs,mjs}": "biome check --write --no-errors-on-unmatched",
+      "*.{json,jsonc}": "biome format --write --no-errors-on-unmatched"
+    }
+  }
+  ```
+</Accordion>
+
+### Editors
+
+<Tabs>
+  <Tab title="VS Code">
+    Install the official [Biome VS Code extension](https://marketplace.visualstudio.com/items?itemName=biomejs.biome).
+
+    ```json .vscode/settings.json
+    {
+      "editor.defaultFormatter": "biomejs.biome",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll.biome": "explicit"
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="WebStorm">
+    1. Install Biome plugin
+    2. Configure Biome path in Settings → Languages & Frameworks → Biome
+    3. Enable "Run on save" option
+  </Tab>
+
+  <Tab title="Neovim">
+    ```lua
+    -- Using null-ls
+    local null_ls = require("null-ls")
+    null_ls.setup({
+      sources = {
+        null_ls.builtins.formatting.biome,
+        null_ls.builtins.diagnostics.biome,
+      },
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Troubleshooting
+
+<Tabs>
+  <Tab title="Formatting Conflicts">
+    <Warning>
+      Disable other formatters (Prettier, ESLint) to avoid conflicts.
+    </Warning>
+
+    ```bash
+    biome format --check src/
+    ```
+  </Tab>
+
+  <Tab title="Performance Issues">
+    <Tip>
+      Use file inclusion/exclusion patterns for large projects.
+    </Tip>
+
+    ```json
+    {
+      "files": {
+        "include": ["src/**/*"],
+        "ignore": ["node_modules/**/*", "dist/**/*"]
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Rule Conflicts">
+    <Info>
+      Check conflicting rules and adjust configuration.
+    </Info>
+
+    ```bash
+    biome explain noUnusedVariables
+    ```
+  </Tab>
+</Tabs>
+
+## Migration
+
+### From Prettier
+
+<Accordion title="Migration Steps">
+  1. Remove Prettier dependencies
+  2. Delete `.prettierrc*` files
+  3. Install Biome and @pelatform/biome-config
+  4. Create `biome.jsonc` with base configuration
+  5. Update editor settings to use Biome
+  6. Update CI/CD scripts
+</Accordion>
+
+### From ESLint
+
+<Accordion title="Migration Steps">
+  1. Remove ESLint and related dependencies
+  2. Delete `.eslintrc*` files
+  3. Install Biome and @pelatform/biome-config
+  4. Create `biome.jsonc` with base configuration
+  5. Migrate custom ESLint rules to Biome equivalents
+  6. Update package.json scripts
+</Accordion>

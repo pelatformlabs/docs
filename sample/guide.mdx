@@ -678,17 +678,17 @@ Standard installation template for packages:
 </Steps>
 ````
 
-### Feature Showcase with Cards
+### Feature Showcase with Columns
 
 ```mdx
-<Cards>
+<Columns cols={2}>
   <Card title="Feature One" icon="zap">
     Description of the first feature with icon
   </Card>
   <Card title="Feature Two" icon="shield-check">
     Description of the second feature with icon
   </Card>
-</Cards>
+</Columns>
 ```
 
 ## Best Practices
@@ -697,7 +697,7 @@ Standard installation template for packages:
 
 - **Installation**: Always use `CodeGroup` with all package managers (npm, yarn, pnpm, bun)
 - **Tutorials**: Use `Steps` for sequential setup guides and tutorials
-- **Features**: Use `Cards` for showcasing features and capabilities
+- **Features**: Use `Columns` with multiple `Card` for showcasing features
 - **Organization**: Use `Tabs` for organizing different approaches or variations
 - **Emphasis**: Use appropriate `Callouts` (Note, Warning, Tip, Info, Check, Danger)
 - **Advanced Content**: Use `Accordion` for optional or advanced information
