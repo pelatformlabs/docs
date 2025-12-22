@@ -1,0 +1,1084 @@
+---
+title: 'API Reference'
+description: 'Complete API reference for Pelatform Storage package with multi-provider support and comprehensive file management'
+keywords: ["storage", "s3", "cloudinary", "minio", "digitalocean", "supabase", "cloudflare-r2", "aws", "file-upload", "api", "typescript"]
+---
+
+Complete API reference for the Pelatform Storage package. This package provides a unified interface for file storage across multiple cloud providers including AWS S3, Cloudflare R2, MinIO, DigitalOcean, Supabase, and Cloudinary.
+
+## Factory Functions
+
+### createS3
+
+Creates an S3Service instance with S3-compatible provider configuration.
+
+```typescript
+import { createS3 } from '@pelatform/storage/s3';
+
+function createS3(config?: S3Config): S3Service
+```
+
+**Parameters:**
+<ParamField path="config" type="S3Config">
+  Manual configuration object. If not provided, automatically detects from environment variables.
+</ParamField>
+
+**Returns:**
+<ResponseField name="service" type="S3Service">
+  Configured S3 storage service instance
+</ResponseField>
+
+**Example:**
+```typescript
+// Auto-detect from environment
+const s3Storage = createS3();
+
+// Manual configuration
+const s3Storage = createS3({
+  provider: 'aws',
+  region: 'us-east-1',
+  bucket: 'my-bucket',
+  accessKeyId: 'AKIAIOSFODNN7EXAMPLE',
+  secretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+});
+```
+
+### createCloudinary
+
+Creates a CloudinaryService instance for media file management.
+
+```typescript
+import { createCloudinary } from '@pelatform/storage/cloudinary';
+
+function createCloudinary(config?: CloudinaryConfig): CloudinaryService
+```
+
+**Parameters:**
+<ParamField path="config" type="CloudinaryConfig">
+  Manual Cloudinary configuration. Missing values are loaded from environment variables.
+</ParamField>
+
+**Example:**
+```typescript
+const cloudinaryStorage = createCloudinary({
+  cloudName: 'my-cloud',
+  apiKey: '123456789012345',
+  apiSecret: 'my-secret-key'
+});
+```
+
+### isStorageConfigured
+
+Checks if any storage service is properly configured.
+
+```typescript
+import { isStorageConfigured } from '@pelatform/storage';
+
+function isStorageConfigured(): boolean
+```
+
+**Returns:**
+<ResponseField name="result" type="boolean">
+  `true` if at least one provider is configured, `false` otherwise
+</ResponseField>
+
+### getConfiguredProvider
+
+Returns the currently configured storage provider.
+
+```typescript
+import { getConfiguredProvider } from '@pelatform/storage';
+
+function getConfiguredProvider(): StorageProvider | null
+```
+
+**Returns:**
+<ResponseField name="provider" type="StorageProvider | null">
+  The configured provider or `null` if none configured
+</ResponseField>
+
+## Service Classes
+
+### S3Service
+
+Main storage service class for S3-compatible providers with unified API interface.
+
+#### Constructor
+
+```typescript
+constructor(config?: S3Config)
+```
+
+#### Methods
+
+##### upload
+
+Upload a file to storage.
+
+```typescript
+async upload(options: UploadOptions): Promise<UploadResult>
+```
+
+**Parameters:**
+<ParamField path="options" type="UploadOptions" required>
+  <ParamField path="key" type="string" required>
+    File path/key in storage
+  </ParamField>
+  <ParamField path="file" type="Buffer | Uint8Array | string" required>
+    File content
+  </ParamField>
+  <ParamField path="contentType" type="string">
+    MIME type
+  </ParamField>
+  <ParamField path="metadata" type="Record<string, string>">
+    Custom metadata
+  </ParamField>
+  <ParamField path="cacheControl" type="string">
+    Cache control header
+  </ParamField>
+  <ParamField path="contentDisposition" type="string">
+    Content disposition
+  </ParamField>
+  <ParamField path="acl" type='"private" | "public-read" | "public-read-write"'>
+    Access control
+  </ParamField>
+  <ParamField path="expires" type="Date">
+    Expiration date
+  </ParamField>
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<UploadResult>">
+  Upload result object
+</ResponseField>
+
+**Example:**
+```typescript
+const result = await s3Storage.upload({
+  key: 'uploads/documents/report.pdf',
+  file: fileBuffer,
+  contentType: 'application/pdf',
+  metadata: {
+    userId: '12345',
+    originalName: 'annual-report.pdf'
+  },
+  acl: 'public-read'
+});
+```
+
+##### download
+
+Download a file from storage.
+
+```typescript
+async download(options: DownloadOptions): Promise<DownloadResult>
+```
+
+**Parameters:**
+<ParamField path="options" type="DownloadOptions" required>
+  <ParamField path="key" type="string" required>
+    File path/key in storage
+  </ParamField>
+  <ParamField path="range" type="string">
+    Byte range for partial downloads
+  </ParamField>
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<DownloadResult>">
+  Download result object containing file content and metadata
+</ResponseField>
+
+##### delete
+
+Delete a file from storage.
+
+```typescript
+async delete(options: DeleteOptions): Promise<DeleteResult>
+```
+
+**Parameters:**
+<ParamField path="options" type="DeleteOptions" required>
+  <ParamField path="key" type="string" required>
+    File path/key in storage
+  </ParamField>
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<DeleteResult>">
+  Delete result object
+</ResponseField>
+
+##### batchDelete
+
+Delete multiple files from storage.
+
+```typescript
+async batchDelete(options: BatchDeleteOptions): Promise<BatchDeleteResult>
+```
+
+**Parameters:**
+<ParamField path="options" type="BatchDeleteOptions" required>
+  <ParamField path="keys" type="string[]" required>
+    Array of file keys to delete
+  </ParamField>
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<BatchDeleteResult>">
+  Batch delete result object
+</ResponseField>
+
+##### list
+
+List files and folders in a directory.
+
+```typescript
+async list(options?: ListOptions): Promise<ListResult>
+```
+
+**Parameters:**
+<ParamField path="options" type="ListOptions">
+  <ParamField path="prefix" type="string">
+    Path prefix to filter
+  </ParamField>
+  <ParamField path="maxKeys" type="number">
+    Maximum number of results
+  </ParamField>
+  <ParamField path="continuationToken" type="string">
+    Token for pagination
+  </ParamField>
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<ListResult>">
+  List result object
+</ResponseField>
+
+##### exists
+
+Check if a file exists in storage.
+
+```typescript
+async exists(key: string): Promise<ExistsResult>
+```
+
+**Parameters:**
+<ParamField path="key" type="string" required>
+  File path/key in storage
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<ExistsResult>">
+  Exists result object
+</ResponseField>
+
+##### copy
+
+Copy a file to a new location.
+
+```typescript
+async copy(options: CopyOptions): Promise<CopyResult>
+```
+
+**Parameters:**
+<ParamField path="options" type="CopyOptions" required>
+  <ParamField path="sourceKey" type="string" required>
+    Source file path
+  </ParamField>
+  <ParamField path="destinationKey" type="string" required>
+    Destination file path
+  </ParamField>
+  <ParamField path="metadata" type="Record<string, string>">
+    New metadata
+  </ParamField>
+  <ParamField path="metadataDirective" type='"COPY" | "REPLACE"'>
+    How to handle metadata
+  </ParamField>
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<CopyResult>">
+  Copy result object
+</ResponseField>
+
+##### move
+
+Move a file to a new location.
+
+```typescript
+async move(options: MoveOptions): Promise<MoveResult>
+```
+
+**MoveOptions Interface:**
+```typescript
+interface MoveOptions {
+  sourceKey: string                      // Required: Source file path
+  destinationKey: string                 // Required: Destination file path
+  metadata?: Record<string, string>      // Optional: New metadata
+  metadataDirective?: "COPY" | "REPLACE" // Optional: How to handle metadata
+}
+```
+
+##### duplicate
+
+Create a duplicate of a file.
+
+```typescript
+async duplicate(options: DuplicateOptions): Promise<DuplicateResult>
+```
+
+**DuplicateOptions Interface:**
+```typescript
+interface DuplicateOptions {
+  sourceKey: string           // Required: Source file path
+  duplicateKey: string        // Required: Duplicate file path
+}
+```
+
+##### getPresignedUrl
+
+Generate a presigned URL for temporary access.
+
+```typescript
+async getPresignedUrl(options: PresignedUrlOptions): Promise<PresignedUrlResult>
+```
+
+**PresignedUrlOptions Interface:**
+```typescript
+interface PresignedUrlOptions {
+  key: string              // Required: File path/key
+  operation: "get" | "put" // Required: URL operation type
+  expiresIn?: number       // Optional: Expiration time in seconds (default: 3600)
+  contentType?: string     // Optional: Content type (required for PUT operations)
+}
+```
+
+##### getPublicUrl
+
+Get the public URL for a file.
+
+```typescript
+getPublicUrl(key: string): string
+```
+
+##### Folder Operations
+
+```typescript
+// Create folder
+async createFolder(options: CreateFolderOptions): Promise<CreateFolderResult>
+
+// Delete folder
+async deleteFolder(options: DeleteFolderOptions): Promise<DeleteFolderResult>
+
+// List folders
+async listFolders(options?: ListFoldersOptions): Promise<ListFoldersResult>
+
+// Check if folder exists
+async folderExists(path: string): Promise<FolderExistsResult>
+
+// Rename folder
+async renameFolder(options: RenameFolderOptions): Promise<RenameFolderResult>
+
+// Copy folder
+async copyFolder(options: CopyFolderOptions): Promise<CopyFolderResult>
+```
+
+### CloudinaryService
+
+Cloudinary-specific storage service with media transformation capabilities.
+
+Implements the same interface as S3Service with additional Cloudinary-specific features:
+
+```typescript
+// Cloudinary-specific upload with transformations
+await cloudinaryStorage.upload({
+  key: 'images/profile.jpg',
+  file: imageBuffer,
+  transformations: {
+    width: 300,
+    height: 300,
+    crop: 'fill',
+    gravity: 'face'
+  }
+});
+```
+
+## Configuration Types
+
+### StorageProvider
+
+```typescript
+type StorageProvider =
+  | "aws"
+  | "cloudflare-r2"
+  | "minio"
+  | "digitalocean"
+  | "supabase"
+  | "custom"
+  | "cloudinary"
+```
+
+### S3Config
+
+```typescript
+interface S3Config {
+  provider: StorageProvider  // S3-compatible provider
+  region: string            // AWS region
+  bucket: string           // S3 bucket name
+  accessKeyId: string      // AWS access key
+  secretAccessKey: string  // AWS secret key
+  endpoint?: string        // Custom endpoint (for MinIO, custom S3)
+  forcePathStyle?: boolean // Force path-style URLs
+  publicUrl?: string       // CDN or custom domain URL
+}
+```
+
+### CloudinaryConfig
+
+```typescript
+interface CloudinaryConfig {
+  provider: "cloudinary"
+  cloudName: string    // Cloudinary cloud name
+  apiKey: string      // Cloudinary API key
+  apiSecret: string   // Cloudinary API secret
+  secure?: boolean    // Use HTTPS (default: true)
+  folder?: string     // Default upload folder
+}
+```
+
+### StorageConfig
+
+```typescript
+type StorageConfig = S3Config | CloudinaryConfig
+```
+
+## Result Types
+
+### Operation Results
+
+All storage operations return structured result objects:
+
+```typescript
+interface UploadResult {
+  success: boolean
+  key?: string
+  url?: string
+  publicUrl?: string
+  etag?: string
+  size?: number
+  error?: string
+}
+
+interface DownloadResult {
+  success: boolean
+  content?: Buffer     // Main content field
+  data?: Buffer        // Alias for backward compatibility
+  contentType?: string
+  contentLength?: number
+  lastModified?: Date
+  etag?: string
+  metadata?: Record<string, string>
+  error?: string
+}
+
+interface DeleteResult {
+  success: boolean
+  error?: string
+}
+
+interface BatchDeleteResult {
+  success: boolean
+  deleted: string[]      // Successfully deleted keys
+  failed: Array<{        // Failed deletions
+    key: string
+    error: string
+  }>
+  error?: string
+}
+
+interface ListResult {
+  success: boolean
+  files: Array<{
+    key: string
+    size: number
+    lastModified: Date
+    etag: string
+  }>
+  folders: string[]     // Folder names
+  isTruncated: boolean  // If more results available
+  nextContinuationToken?: string
+  error?: string
+}
+
+interface CopyResult {
+  success: boolean
+  destinationKey?: string
+  etag?: string
+  error?: string
+}
+
+interface PresignedUrlResult {
+  success: boolean
+  url?: string
+  expiresAt?: Date
+  error?: string
+}
+```
+
+## Configuration Utilities
+
+### loadS3Config
+
+Load S3 configuration from environment variables.
+
+```typescript
+function loadS3Config(): S3Config | null
+```
+
+### loadCloudinaryConfig
+
+Load Cloudinary configuration from environment variables.
+
+```typescript
+function loadCloudinaryConfig(): CloudinaryConfig | null
+```
+
+### loadStorageConfig
+
+Auto-detect and load storage configuration from environment variables.
+
+```typescript
+function loadStorageConfig(): StorageConfig | null
+```
+
+### hasStorageConfig
+
+Quick check if any storage provider is configured.
+
+```typescript
+function hasStorageConfig(): boolean
+```
+
+### validateS3Config
+
+Validate S3 configuration object.
+
+```typescript
+function validateS3Config(config: S3Config): ConfigValidationResult
+```
+
+**ConfigValidationResult Interface:**
+```typescript
+interface ConfigValidationResult {
+  valid: boolean
+  errors: string[]
+}
+```
+
+### getStorageEnvVars
+
+Get environment variables with sensitive values masked.
+
+```typescript
+function getStorageEnvVars(): Record<string, string>
+```
+
+## Helper Functions
+
+### File Generation and Validation
+
+```typescript
+// Generate unique file key with timestamp
+function generateFileKey(filename: string, folder?: string): string
+```
+**Parameters:**
+<ParamField path="filename" type="string" required>
+  Original filename
+</ParamField>
+<ParamField path="folder" type="string">
+  Optional folder prefix
+</ParamField>
+
+**Returns:**
+<ResponseField name="key" type="string">
+  Generated unique file key
+</ResponseField>
+
+```typescript
+// Validate file size against limits
+function validateFileSize(size: number, maxSize: number): ValidationResult
+```
+**Parameters:**
+<ParamField path="size" type="number" required>
+  File size in bytes
+</ParamField>
+<ParamField path="maxSize" type="number" required>
+  Maximum allowed size in bytes
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="ValidationResult">
+  Validation result
+</ResponseField>
+
+```typescript
+// Validate file type against allowed types
+function validateFileType(filename: string, allowedTypes: string[]): ValidationResult
+```
+**Parameters:**
+<ParamField path="filename" type="string" required>
+  Filename to check
+</ParamField>
+<ParamField path="allowedTypes" type="string[]" required>
+  Array of allowed MIME types or extensions
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="ValidationResult">
+  Validation result
+</ResponseField>
+
+```typescript
+// Sanitize filename for S3 compatibility
+function sanitizeFileName(filename: string): string
+```
+**Parameters:**
+<ParamField path="filename" type="string" required>
+  Filename to sanitize
+</ParamField>
+
+**Returns:**
+<ResponseField name="filename" type="string">
+  Sanitized filename
+</ResponseField>
+
+```typescript
+// Validate S3 key format
+function validateS3Key(key: string): ValidationResult
+```
+**Parameters:**
+<ParamField path="key" type="string" required>
+  S3 key to validate
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="ValidationResult">
+  Validation result
+</ResponseField>
+
+**ValidationResult Interface:**
+<ResponseField name="ValidationResult" type="object">
+  <ResponseField name="valid" type="boolean">
+    Is valid
+  </ResponseField>
+  <ResponseField name="error" type="string">
+    Error message if invalid
+  </ResponseField>
+</ResponseField>
+
+### File Information and Type Detection
+
+```typescript
+// Get MIME type from file extension
+function getMimeType(filename: string): string
+```
+**Parameters:**
+<ParamField path="filename" type="string" required>
+  Filename to check
+</ParamField>
+**Returns:**
+<ResponseField name="mimeType" type="string">
+  MIME type
+</ResponseField>
+
+```typescript
+// Extract file metadata from File object
+function getFileInfo(file: File): FileInfo
+```
+**Parameters:**
+<ParamField path="file" type="File" required>
+  File object
+</ParamField>
+**Returns:**
+<ResponseField name="info" type="FileInfo">
+  File metadata
+</ResponseField>
+
+```typescript
+// Detect file type from content using magic numbers
+function detectFileTypeFromContent(buffer: Buffer): FileTypeDetection
+```
+**Parameters:**
+<ParamField path="buffer" type="Buffer" required>
+  File content buffer
+</ParamField>
+**Returns:**
+<ResponseField name="detection" type="FileTypeDetection">
+  Detected file type info
+</ResponseField>
+
+```typescript
+// File type checks
+function isImageFile(filename: string): boolean
+function isVideoFile(filename: string): boolean
+function isAudioFile(filename: string): boolean
+function isDocumentFile(filename: string): boolean
+```
+**Parameters:**
+<ParamField path="filename" type="string" required>
+  Filename to check
+</ParamField>
+**Returns:**
+<ResponseField name="result" type="boolean">
+  True if file matches the category
+</ResponseField>
+
+### Path and URL Operations
+
+```typescript
+// Build public URL for files
+function buildPublicUrl(bucket: string, key: string, baseUrl?: string): string
+```
+**Parameters:**
+<ParamField path="bucket" type="string" required>
+  Bucket name
+</ParamField>
+<ParamField path="key" type="string" required>
+  File key
+</ParamField>
+<ParamField path="baseUrl" type="string">
+  Optional base URL override
+</ParamField>
+**Returns:**
+<ResponseField name="url" type="string">
+  Public URL
+</ResponseField>
+
+```typescript
+// Parse S3 URL to extract bucket and key
+function parseS3Url(url: string): { bucket: string; key: string } | null
+```
+**Parameters:**
+<ParamField path="url" type="string" required>
+  S3 URL to parse
+</ParamField>
+**Returns:**
+<ResponseField name="result" type="object | null">
+  Bucket and key, or null if invalid
+</ResponseField>
+
+```typescript
+// Extract S3 info from URL
+function extractS3Info(url: string): S3UrlInfo | null
+```
+**Parameters:**
+<ParamField path="url" type="string" required>
+  URL to extract info from
+</ParamField>
+**Returns:**
+<ResponseField name="info" type="S3UrlInfo | null">
+  Extracted S3 info
+</ResponseField>
+
+```typescript
+// Normalize path separators
+function normalizePath(path: string): string
+```
+**Parameters:**
+<ParamField path="path" type="string" required>
+  Path to normalize
+</ParamField>
+**Returns:**
+<ResponseField name="path" type="string">
+  Normalized path
+</ResponseField>
+
+```typescript
+// Safely join path segments
+function joinPath(...segments: string[]): string
+```
+**Parameters:**
+<ParamField path="segments" type="string[]" required>
+  Path segments to join
+</ParamField>
+**Returns:**
+<ResponseField name="path" type="string">
+  Joined path
+</ResponseField>
+
+```typescript
+// Get parent directory from file key
+function getParentPath(key: string): string
+```
+**Parameters:**
+<ParamField path="key" type="string" required>
+  File key
+</ParamField>
+**Returns:**
+<ResponseField name="path" type="string">
+  Parent directory path
+</ResponseField>
+
+```typescript
+// Extract filename from path
+function getFileName(key: string): string
+```
+**Parameters:**
+<ParamField path="key" type="string" required>
+  File key
+</ParamField>
+**Returns:**
+<ResponseField name="filename" type="string">
+  Extracted filename
+</ResponseField>
+
+### Buffer and Data Conversion
+
+```typescript
+// Convert File object to Buffer
+function fileToBuffer(file: File): Promise<Buffer>
+```
+**Parameters:**
+<ParamField path="file" type="File" required>
+  File object
+</ParamField>
+**Returns:**
+<ResponseField name="buffer" type="Promise<Buffer>">
+  File content as Buffer
+</ResponseField>
+
+```typescript
+// Convert base64 to Buffer
+function base64ToBuffer(base64: string): Buffer
+```
+**Parameters:**
+<ParamField path="base64" type="string" required>
+  Base64 string
+</ParamField>
+**Returns:**
+<ResponseField name="buffer" type="Buffer">
+  Decoded buffer
+</ResponseField>
+
+```typescript
+// Convert Buffer to base64
+function bufferToBase64(buffer: Buffer): string
+```
+**Parameters:**
+<ParamField path="buffer" type="Buffer" required>
+  Buffer to encode
+</ParamField>
+**Returns:**
+<ResponseField name="base64" type="string">
+  Base64 string
+</ResponseField>
+
+```typescript
+// Generate file hash/checksum
+function generateFileHash(buffer: Buffer, algorithm?: string): string
+```
+**Parameters:**
+<ParamField path="buffer" type="Buffer" required>
+  Content buffer
+</ParamField>
+<ParamField path="algorithm" type="string" default="md5">
+  Hash algorithm (md5, sha256, etc)
+</ParamField>
+**Returns:**
+<ResponseField name="hash" type="string">
+  Generated hash
+</ResponseField>
+
+### Batch Operations
+
+```typescript
+// Generate multiple unique keys
+function generateBatchKeys(filenames: string[], folder?: string): string[]
+```
+**Parameters:**
+<ParamField path="filenames" type="string[]" required>
+  Original filenames
+</ParamField>
+<ParamField path="folder" type="string">
+  Optional folder prefix
+</ParamField>
+**Returns:**
+<ResponseField name="keys" type="string[]">
+  Generated unique keys
+</ResponseField>
+
+```typescript
+// Validate multiple files at once
+function validateBatchFiles(files: File[], options: BatchValidationOptions): BatchValidationResult
+```
+**Parameters:**
+<ParamField path="files" type="File[]" required>
+  Files to validate
+</ParamField>
+<ParamField path="options" type="BatchValidationOptions" required>
+  Validation options
+</ParamField>
+**Returns:**
+<ResponseField name="result" type="BatchValidationResult">
+  Batch validation result
+</ResponseField>
+
+### Content Headers
+
+```typescript
+// Generate cache control header
+function generateCacheControl(maxAge?: number, options?: CacheControlOptions): string
+```
+**Parameters:**
+<ParamField path="maxAge" type="number" default="3600">
+  Max age in seconds
+</ParamField>
+<ParamField path="options" type="CacheControlOptions">
+  Additional options (public, private, immutable, etc)
+</ParamField>
+**Returns:**
+<ResponseField name="header" type="string">
+  Cache-Control header value
+</ResponseField>
+
+```typescript
+// Generate content disposition header
+function getContentDisposition(filename: string, type?: 'inline' | 'attachment'): string
+```
+**Parameters:**
+<ParamField path="filename" type="string" required>
+  Filename
+</ParamField>
+<ParamField path="type" type='"inline" | "attachment"' default="inline">
+  Disposition type
+</ParamField>
+**Returns:**
+<ResponseField name="header" type="string">
+  Content-Disposition header value
+</ResponseField>
+
+## Environment Variables
+
+### S3 Configuration
+
+```bash
+PELATFORM_S3_PROVIDER=aws                    # Provider: aws, cloudflare-r2, minio, digitalocean, supabase, custom
+PELATFORM_S3_REGION=us-east-1               # AWS region
+PELATFORM_S3_BUCKET=my-bucket               # S3 bucket name
+PELATFORM_S3_ACCESS_KEY_ID=AKIA...           # AWS access key
+PELATFORM_S3_SECRET_ACCESS_KEY=secret...     # AWS secret key
+PELATFORM_S3_ENDPOINT=https://s3.example.com # Custom endpoint (optional)
+PELATFORM_S3_FORCE_PATH_STYLE=true          # Force path-style URLs (optional)
+PELATFORM_S3_PUBLIC_URL=https://cdn.example.com # CDN URL (optional)
+```
+
+### Cloudinary Configuration
+
+```bash
+PELATFORM_CLOUDINARY_CLOUD_NAME=my-cloud    # Cloudinary cloud name
+PELATFORM_CLOUDINARY_API_KEY=1234567890     # Cloudinary API key
+PELATFORM_CLOUDINARY_API_SECRET=secret      # Cloudinary API secret
+PELATFORM_CLOUDINARY_SECURE=true            # Use HTTPS (default: true)
+PELATFORM_CLOUDINARY_FOLDER=uploads         # Default upload folder (optional)
+```
+
+## Error Handling
+
+All methods return structured results with error information:
+
+```typescript
+const result = await s3Storage.upload(options);
+
+if (result.success) {
+  console.log('File uploaded:', result.key);
+  console.log('Public URL:', result.publicUrl);
+} else {
+  console.error('Upload failed:', result.error);
+}
+```
+
+Common error scenarios:
+- Invalid configuration
+- Authentication/authorization failures
+- Network connectivity issues
+- File size limits exceeded
+- Invalid file paths
+- Permission denied
+- Bucket not found
+- Rate limiting
+
+## Usage Examples
+
+### Basic S3 Usage
+
+```typescript
+import { createS3 } from '@pelatform/storage';
+
+const s3Storage = createS3({
+  provider: 'aws',
+  region: 'us-east-1',
+  bucket: 'my-app-files',
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+});
+
+// Upload file
+const uploadResult = await s3Storage.upload({
+  key: 'documents/user-guide.pdf',
+  file: fileBuffer,
+  contentType: 'application/pdf',
+  acl: 'public-read'
+});
+
+// Generate presigned URL for download
+const urlResult = await s3Storage.getPresignedUrl({
+  key: 'documents/user-guide.pdf',
+  operation: 'get',
+  expiresIn: 3600 // 1 hour
+});
+```
+
+### Cloudinary Media Management
+
+```typescript
+import { createCloudinary } from '@pelatform/storage';
+
+const cloudinaryStorage = createCloudinary();
+
+// Upload image with transformations
+const result = await cloudinaryStorage.upload({
+  key: 'profiles/user-avatar.jpg',
+  file: imageBuffer,
+  contentType: 'image/jpeg'
+});
+
+// Get public URL with transformations
+const publicUrl = cloudinaryStorage.getPublicUrl('profiles/user-avatar.jpg');
+```
+
+### Helper Functions Usage
+
+```typescript
+import {
+  generateFileKey,
+  validateFileSize,
+  getMimeType,
+  sanitizeFileName
+} from '@pelatform/storage';
+
+// Generate unique filename
+const uniqueKey = generateFileKey('profile-picture.jpg', 'avatars');
+
+// Validate file before upload
+const validation = validateFileSize(file.size, 5 * 1024 * 1024); // 5MB limit
+if (!validation.valid) {
+  throw new Error(validation.error);
+}
+
+// Get MIME type
+const mimeType = getMimeType('document.pdf'); // Returns: 'application/pdf'
+
+// Sanitize filename
+const safeName = sanitizeFileName('My Document (Final).pdf'); // Returns: 'My-Document-Final.pdf'
+```

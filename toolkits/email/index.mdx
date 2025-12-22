@@ -1,0 +1,271 @@
+---
+title: 'Overview'
+description: 'Email templates and sending utilities for SaaS applications with React support and multiple providers'
+keywords: ["email", "smtp", "nodemailer", "resend", "react-email", "saas", "templates"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/email.svg)](https://www.npmjs.org/package/@pelatform/email)
+
+Comprehensive email solution for SaaS applications with React template rendering and support for multiple providers including Resend and SMTP (Nodemailer). Built with modern TypeScript and designed for seamless integration.
+
+<Columns cols={1}>
+  <Card title="Multiple Providers" icon="layers">
+    <ul>
+      <li><strong>Resend</strong>: Modern email API with advanced features</li>
+      <li><strong>SMTP/Nodemailer</strong>: Traditional SMTP support</li>
+      <li><strong>Auto-detection</strong>: Automatic provider selection from environment</li>
+      <li><strong>Easy switching</strong>: Change providers without code changes</li>
+    </ul>
+  </Card>
+
+  <Card title="React Templates" icon="react">
+    <ul>
+      <li><strong>JSX Support</strong>: Write email templates with React components</li>
+      <li><strong>TypeScript</strong>: Full type safety for template props</li>
+      <li><strong>HTML Generation</strong>: Automatic HTML and text generation</li>
+      <li><strong>Reusable Components</strong>: Build consistent email designs</li>
+    </ul>
+  </Card>
+
+  <Card title="Production Ready" icon="shield-check">
+    <ul>
+      <li><strong>Error Handling</strong>: Comprehensive error management</li>
+      <li><strong>Validation</strong>: Configuration validation utilities</li>
+      <li><strong>Attachments</strong>: File attachment support</li>
+      <li><strong>Analytics</strong>: Built-in email tracking and analytics</li>
+    </ul>
+  </Card>
+</Columns>
+
+## Installation
+
+<PackageInstaller command="installer @pelatform/email react" />
+
+<Note>
+React is a peer dependency. Make sure you have React 18+ installed in your project.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="Configure Environment">
+    Set up your email provider environment variables:
+
+    <Tabs>
+      <Tab title="Resend">
+        ```bash .env
+        PELATFORM_EMAIL_RESEND_API_KEY=re_your_api_key
+        PELATFORM_EMAIL_FROM_NAME=Your App
+        PELATFORM_EMAIL_FROM_EMAIL=noreply@yourapp.com
+        PELATFORM_EMAIL_REPLY_TO=support@yourapp.com
+        ```
+      </Tab>
+
+      <Tab title="SMTP/Nodemailer">
+        ```bash .env
+        PELATFORM_EMAIL_SMTP_HOST=smtp.gmail.com
+        PELATFORM_EMAIL_SMTP_PORT=587
+        PELATFORM_EMAIL_SMTP_SECURE=false
+        PELATFORM_EMAIL_SMTP_USER=your-email@gmail.com
+        PELATFORM_EMAIL_SMTP_PASS=your-app-password
+        PELATFORM_EMAIL_FROM_NAME=Your App
+        PELATFORM_EMAIL_FROM_EMAIL=noreply@yourapp.com
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Create Email Service">
+    Initialize the email service:
+
+    ```typescript src/email.ts
+    import { createEmail } from '@pelatform/email';
+
+    // Auto-detects provider from environment variables
+    const email = createEmail();
+
+    export { email };
+    ```
+  </Step>
+
+  <Step title="Send Your First Email">
+    Send a simple HTML email:
+
+    ```typescript
+    import { email } from './email';
+
+    await email.sendEmail({
+      to: 'user@example.com',
+      subject: 'Welcome to Our App!',
+      html: '<h1>Welcome!</h1><p>Thanks for joining us.</p>'
+    });
+    ```
+  </Step>
+
+  <Step title="Send React Template">
+    Create and send a React email template:
+
+    ```typescript
+    import React from 'react';
+    import { email } from './email';
+
+    const WelcomeEmail = ({ userName }: { userName: string }) => (
+      <div>
+        <h1>Welcome, {userName}!</h1>
+        <p>Thank you for signing up for our service.</p>
+        <button>Get Started</button>
+      </div>
+    );
+
+    await email.sendTemplate(WelcomeEmail, { userName: 'John' }, {
+      to: 'john@example.com',
+      subject: 'Welcome to Our App!'
+    });
+    ```
+  </Step>
+</Steps>
+
+## Key Features
+
+### Factory Functions
+
+```typescript
+import { createEmail, createResend, createNodemailer } from '@pelatform/email';
+
+// Auto-detect from environment
+const email = createEmail();
+
+// Manual Resend configuration
+const resendEmail = createResend({
+  apiKey: 're_your_api_key',
+  from: { name: 'Your App', email: 'noreply@yourapp.com' }
+});
+
+// Manual SMTP configuration
+const smtpEmail = createNodemailer({
+  from: { name: 'Your App', email: 'noreply@yourapp.com' },
+  smtp: {
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: { user: 'your-email@gmail.com', pass: 'your-app-password' }
+  }
+});
+```
+
+### Service Methods
+
+```typescript
+// Send HTML/text email
+await email.sendEmail({
+  to: 'user@example.com',
+  subject: 'Welcome!',
+  html: '<h1>Welcome!</h1>',
+  attachments: [pdfBuffer],
+  tags: { category: 'onboarding' }
+});
+
+// Send React template
+await email.sendTemplate(WelcomeEmail, { userName: 'John' }, {
+  to: 'john@example.com',
+  subject: 'Welcome!'
+});
+```
+
+### React Email Templates
+
+Import React Email components for building beautiful templates:
+
+```typescript
+import {
+  Html, Head, Body, Container, Section,
+  Text, Heading, Link, Button, Img
+} from '@pelatform/email/components';
+
+const WelcomeEmail = ({ userName, loginUrl }) => (
+  <Html>
+    <Head>
+      <title>Welcome</title>
+    </Head>
+    <Body>
+      <Container>
+        <Heading>Welcome, {userName}!</Heading>
+        <Text>Thanks for joining our platform.</Text>
+        <Button href={loginUrl}>Get Started</Button>
+      </Container>
+    </Body>
+  </Html>
+);
+```
+
+## Advanced Features
+
+### Email Attachments
+
+```typescript
+await email.sendEmail({
+  to: 'user@example.com',
+  subject: 'Your Documents',
+  attachments: [
+    {
+      filename: 'invoice.pdf',
+      content: pdfBuffer,
+      contentType: 'application/pdf'
+    }
+  ]
+});
+```
+
+### Email Headers & Tags
+
+```typescript
+await email.sendEmail({
+  to: 'user@example.com',
+  subject: 'Order Confirmation',
+  headers: { 'X-Priority': '1' },
+  tags: {
+    category: 'transactional',
+    order_id: '12345'
+  }
+});
+```
+
+### Bulk Email Sending
+
+```typescript
+const emails = users.map(user => ({
+  to: user.email,
+  subject: 'Welcome!',
+  html: `<h1>Welcome, ${user.name}!</h1>`
+}));
+
+// Send with rate limiting
+for (const emailData of emails) {
+  await email.sendEmail(emailData);
+  await new Promise(resolve => setTimeout(resolve, 100));
+}
+```
+
+## Documentation
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/toolkits/email/api">
+    Complete API documentation with factory functions, service methods, and configuration options
+  </Card>
+
+  <Card title="Real-World Examples" icon="mail-check" href="/toolkits/email/examples">
+    Production-ready examples for SaaS automation, e-commerce, and notification systems
+  </Card>
+</CardGroup>
+
+### Related
+
+- [Configuration](/toolkits/config) - Development configurations for TypeScript projects
+- [Storage Toolkit](/toolkits/storage) - File storage and management for attachments
+- [Utils Toolkit](/toolkits/utils) - Utility functions for email processing and validation
+
+---
+
+Complete email solution with React templates, multi-provider support, and production-ready features for modern SaaS applications.

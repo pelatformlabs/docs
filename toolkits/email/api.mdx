@@ -1,0 +1,821 @@
+---
+title: 'API Reference'
+description: 'Complete API reference for Pelatform Email package with factory functions, service methods, and utilities'
+keywords: ["email", "smtp", "nodemailer", "resend", "react-email", "api", "reference", "typescript"]
+---
+
+Complete API reference for the Pelatform Email package. This API provides a unified interface for sending emails through multiple providers (Resend, SMTP/Nodemailer) with React template support and comprehensive utilities.
+
+## Factory Functions
+
+### createEmail
+
+Creates an EmailService instance with automatic provider detection from environment variables.
+
+```typescript
+function createEmail(config?: EmailConfig): EmailService
+```
+
+**Parameters:**
+<ParamField path="config" type="EmailConfig">
+  Manual configuration object. If not provided, automatically detects from environment variables.
+</ParamField>
+
+**Returns:**
+<ResponseField name="service" type="EmailService">
+  Configured email service instance
+</ResponseField>
+
+**Example:**
+```typescript
+// Auto-detect from environment
+const emailService = createEmail();
+
+// Manual configuration
+const emailService = createEmail({
+  provider: 'resend',
+  apiKey: 're_abc123...',
+  from: {
+    name: 'My App',
+    email: 'noreply@myapp.com'
+  }
+});
+```
+
+### createResend
+
+Creates an EmailService instance specifically configured for Resend.
+
+```typescript
+function createResend(config?: Partial<ResendConfig>): EmailService
+```
+
+**Parameters:**
+<ParamField path="config" type="Partial<ResendConfig>">
+  Partial Resend configuration. Missing values are loaded from environment variables.
+</ParamField>
+
+**Example:**
+```typescript
+const resendEmail = createResend({
+  apiKey: 're_abc123...'
+});
+```
+
+### createNodemailer
+
+Creates an EmailService instance specifically configured for SMTP via Nodemailer.
+
+```typescript
+function createNodemailer(config?: Partial<NodemailerConfig>): EmailService
+```
+
+**Parameters:**
+<ParamField path="config" type="Partial<NodemailerConfig>">
+  Partial SMTP configuration. Missing values are loaded from environment variables.
+</ParamField>
+
+**Example:**
+```typescript
+const smtpEmail = createNodemailer({
+  smtp: {
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'user@gmail.com',
+      pass: 'app-password'
+    }
+  }
+});
+```
+
+### isEmailConfigured
+
+Checks if email service is properly configured.
+
+```typescript
+function isEmailConfigured(): boolean
+```
+
+**Returns:**
+<ResponseField name="result" type="boolean">
+  `true` if at least one provider is configured, `false` otherwise
+</ResponseField>
+
+### getConfiguredProvider
+
+Returns the currently configured email provider.
+
+```typescript
+function getConfiguredProvider(): EmailProvider | null
+```
+
+**Returns:**
+<ResponseField name="provider" type="EmailProvider | null">
+  The configured provider or `null` if none configured
+</ResponseField>
+
+## EmailService Class
+
+The main service class for sending emails with unified API across providers.
+
+### Constructor
+
+```typescript
+constructor(config: EmailConfig)
+```
+
+### Methods
+
+#### sendEmail
+
+Send an email with HTML and/or text content.
+
+```typescript
+async sendEmail(options: SendEmailOptions): Promise<EmailResult>
+```
+
+**Parameters:**
+<ParamField path="options" type="SendEmailOptions" required>
+  <ParamField path="to" type="string | string[]" required>
+    Recipient email(s)
+  </ParamField>
+  <ParamField path="cc" type="string | string[]">
+    CC recipients
+  </ParamField>
+  <ParamField path="bcc" type="string | string[]">
+    BCC recipients
+  </ParamField>
+  <ParamField path="subject" type="string" required>
+    Email subject
+  </ParamField>
+  <ParamField path="html" type="string">
+    HTML content
+  </ParamField>
+  <ParamField path="text" type="string">
+    Plain text content
+  </ParamField>
+  <ParamField path="attachments" type="EmailAttachment[]">
+    File attachments
+    <ParamField path="filename" type="string" required>
+      File name
+    </ParamField>
+    <ParamField path="content" type="Buffer | string" required>
+      File content
+    </ParamField>
+    <ParamField path="contentType" type="string">
+      MIME type
+    </ParamField>
+    <ParamField path="cid" type="string">
+      Content-ID for inline images
+    </ParamField>
+  </ParamField>
+  <ParamField path="headers" type="Record<string, string>">
+    Custom headers
+  </ParamField>
+  <ParamField path="tags" type="Record<string, string>">
+    Email tags (provider-specific)
+  </ParamField>
+  <ParamField path="priority" type="1 | 2 | 3 | 4 | 5">
+    Email priority (1=high, 5=low)
+  </ParamField>
+  <ParamField path="scheduledAt" type="Date">
+    Schedule for later delivery
+  </ParamField>
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<EmailResult>">
+  Email result object
+</ResponseField>
+
+**Example:**
+```typescript
+const result = await emailService.sendEmail({
+  to: 'user@example.com',
+  subject: 'Welcome to My App!',
+  html: '<h1>Welcome!</h1><p>Thanks for joining us.</p>',
+  text: 'Welcome! Thanks for joining us.',
+  attachments: [{
+    filename: 'welcome.pdf',
+    content: Buffer.from('PDF content'),
+    contentType: 'application/pdf'
+  }]
+});
+```
+
+#### sendTemplate
+
+Send an email using a React component template.
+
+```typescript
+async sendTemplate<T>(
+  Template: React.ComponentType<T>,
+  props: T,
+  options: Omit<SendEmailOptions, "html" | "text">
+): Promise<EmailResult>
+```
+
+**Parameters:**
+<ParamField path="Template" type="React.ComponentType<T>" required>
+  React component class for the email template
+</ParamField>
+<ParamField path="props" type="T" required>
+  Props to pass to the React component
+</ParamField>
+<ParamField path="options" type="Omit<SendEmailOptions, 'html' | 'text'>" required>
+  Email options (excluding html/text as they're generated from template)
+</ParamField>
+
+**Returns:**
+<ResponseField name="result" type="Promise<EmailResult>">
+  Email result object
+</ResponseField>
+
+#### getConfig
+
+Get the current configuration.
+
+```typescript
+getConfig(): EmailConfig
+```
+
+**Returns:**
+<ResponseField name="config" type="EmailConfig">
+  Current configuration object
+</ResponseField>
+
+#### updateConfig
+
+Update the service configuration.
+
+```typescript
+updateConfig(config: EmailConfig): void
+```
+
+**Parameters:**
+<ParamField path="config" type="EmailConfig" required>
+  New configuration object
+</ParamField>
+
+#### validateConfig
+
+Validate the current configuration by testing connection to the provider.
+
+```typescript
+async validateConfig(): Promise<EmailValidationResult>
+```
+
+**Returns:**
+<ResponseField name="result" type="Promise<EmailValidationResult>">
+  Validation result
+  <ResponseField name="valid" type="boolean">
+    Is valid
+  </ResponseField>
+  <ResponseField name="error" type="string">
+    Error message if invalid
+  </ResponseField>
+</ResponseField>
+
+## Configuration Types
+
+### EmailProvider
+
+```typescript
+type EmailProvider = "resend" | "nodemailer"
+```
+
+### BaseEmailConfig
+
+```typescript
+interface BaseEmailConfig {
+  provider: EmailProvider
+  from: {
+    name: string
+    email: string
+  }
+  replyTo?: string
+}
+```
+
+### ResendConfig
+
+```typescript
+interface ResendConfig extends BaseEmailConfig {
+  provider: "resend"
+  apiKey: string
+}
+```
+
+### NodemailerConfig
+
+```typescript
+interface NodemailerConfig extends BaseEmailConfig {
+  provider: "nodemailer"
+  smtp: {
+    host: string
+    port: number
+    secure: boolean
+    auth: {
+      user: string
+      pass: string
+    }
+  }
+}
+```
+
+### EmailConfig
+
+```typescript
+type EmailConfig = ResendConfig | NodemailerConfig
+```
+
+## Configuration Utilities
+
+### loadEmailConfig
+
+Auto-detect and load email configuration from environment variables.
+
+```typescript
+function loadEmailConfig(): EmailConfig | null
+```
+
+**Returns:**
+<ResponseField name="config" type="EmailConfig | null">
+  Email configuration or `null` if not found
+</ResponseField>
+
+### loadResendConfig
+
+Load Resend-specific configuration.
+
+```typescript
+function loadResendConfig(): ResendConfig | null
+```
+
+**Returns:**
+<ResponseField name="config" type="ResendConfig | null">
+  Resend configuration or `null` if not found
+</ResponseField>
+
+### loadNodemailerConfig
+
+Load SMTP/Nodemailer configuration.
+
+```typescript
+function loadNodemailerConfig(): NodemailerConfig | null
+```
+
+**Returns:**
+<ResponseField name="config" type="NodemailerConfig | null">
+  Nodemailer configuration or `null` if not found
+</ResponseField>
+
+### validateEmailEnvVars
+
+Validate all email environment variables.
+
+```typescript
+function validateEmailEnvVars(): ConfigValidationResult
+```
+
+**Returns:**
+<ResponseField name="result" type="ConfigValidationResult">
+  Validation result
+  <ResponseField name="valid" type="boolean">
+    Is valid
+  </ResponseField>
+  <ResponseField name="missing" type="string[]">
+    List of missing variables
+  </ResponseField>
+  <ResponseField name="errors" type="string[]">
+    List of validation errors
+  </ResponseField>
+</ResponseField>
+
+### hasEmailConfig
+
+Quick check if any email provider is configured.
+
+```typescript
+function hasEmailConfig(): boolean
+```
+
+**Returns:**
+<ResponseField name="result" type="boolean">
+  `true` if configuration exists
+</ResponseField>
+
+### getEmailEnvVars
+
+Get environment variables with sensitive values masked.
+
+```typescript
+function getEmailEnvVars(): Record<string, string>
+```
+
+**Returns:**
+<ResponseField name="envVars" type="Record<string, string>">
+  Map of environment variables with masked values
+</ResponseField>
+
+## Email Validation Utilities
+
+### isValidEmail
+
+Validate email format using comprehensive regex.
+
+```typescript
+function isValidEmail(email: string): boolean
+```
+
+**Parameters:**
+<ParamField path="email" type="string" required>
+  Email address to validate
+</ParamField>
+
+**Returns:**
+<ResponseField name="isValid" type="boolean">
+  True if valid email format
+</ResponseField>
+
+### validateEmails
+
+Validate an array or object of emails.
+
+```typescript
+function validateEmails(emails: string | string[]): string[]
+```
+
+**Parameters:**
+<ParamField path="emails" type="string | string[]" required>
+  Single email or array of emails
+</ParamField>
+
+**Returns:**
+<ResponseField name="invalidEmails" type="string[]">
+  Array of invalid email addresses found
+</ResponseField>
+
+### filterValidEmails
+
+Filter out invalid emails from an array.
+
+```typescript
+function filterValidEmails(emails: string[]): string[]
+```
+
+**Parameters:**
+<ParamField path="emails" type="string[]" required>
+  Array of email addresses
+</ParamField>
+
+**Returns:**
+<ResponseField name="validEmails" type="string[]">
+  Array of valid email addresses
+</ResponseField>
+
+### formatEmailAddress
+
+Format email with display name.
+
+```typescript
+function formatEmailAddress(name: string, email: string): string
+```
+
+**Parameters:**
+<ParamField path="name" type="string" required>
+  Display name
+</ParamField>
+<ParamField path="email" type="string" required>
+  Email address
+</ParamField>
+
+**Returns:**
+<ResponseField name="formatted" type="string">
+  Formatted email string (e.g. "Name &lt;email&gt;")
+</ResponseField>
+
+**Example:**
+```typescript
+formatEmailAddress('John Doe', 'john@example.com')
+// Returns: "John Doe <john@example.com>"
+```
+
+### extractEmail
+
+Extract email address from formatted string.
+
+```typescript
+function extractEmail(formatted: string): string
+```
+
+**Parameters:**
+<ParamField path="formatted" type="string" required>
+  Formatted email string
+</ParamField>
+
+**Returns:**
+<ResponseField name="email" type="string">
+  Extracted email address or empty string
+</ResponseField>
+
+### extractDisplayName
+
+Extract display name from formatted email string.
+
+```typescript
+function extractDisplayName(formatted: string): string
+```
+
+**Parameters:**
+<ParamField path="formatted" type="string" required>
+  Formatted email string
+</ParamField>
+
+**Returns:**
+<ResponseField name="name" type="string">
+  Extracted display name or empty string
+</ResponseField>
+
+## Email List Management
+
+### parseEmailList
+
+Parse email list string into array of emails.
+
+```typescript
+function parseEmailList(emailString: string): string[]
+```
+
+**Parameters:**
+<ParamField path="emailString" type="string" required>
+  Comma or semicolon separated email list
+</ParamField>
+
+**Returns:**
+<ResponseField name="emails" type="string[]">
+  Array of parsed email addresses
+</ResponseField>
+
+**Example:**
+```typescript
+parseEmailList('john@example.com, jane@example.com')
+// Returns: ['john@example.com', 'jane@example.com']
+```
+
+### deduplicateEmails
+
+Remove duplicate emails from array.
+
+```typescript
+function deduplicateEmails(emails: string[]): string[]
+```
+
+**Parameters:**
+<ParamField path="emails" type="string[]" required>
+  Array of email addresses
+</ParamField>
+
+**Returns:**
+<ResponseField name="uniqueEmails" type="string[]">
+  Array of unique email addresses
+</ResponseField>
+
+### chunkEmails
+
+Split large email list into smaller chunks.
+
+```typescript
+function chunkEmails(emails: string[], chunkSize: number): string[][]
+```
+
+**Parameters:**
+<ParamField path="emails" type="string[]" required>
+  Array of email addresses
+</ParamField>
+<ParamField path="chunkSize" type="number" required>
+  Size of each chunk
+</ParamField>
+
+**Returns:**
+<ResponseField name="chunks" type="string[][]">
+  Array of email arrays
+</ResponseField>
+
+## Content Processing Utilities
+
+### sanitizeHtml
+
+Sanitize HTML content for email compatibility.
+
+```typescript
+function sanitizeHtml(html: string): string
+```
+
+### truncateText
+
+Truncate text to specified length with ellipsis.
+
+```typescript
+function truncateText(text: string, maxLength: number): string
+```
+
+### generatePreviewText
+
+Generate plain text preview from HTML content.
+
+```typescript
+function generatePreviewText(html: string, maxLength?: number): string
+```
+
+## URL & Tracking Utilities
+
+### generateUnsubscribeLink
+
+Generate unsubscribe link with token.
+
+```typescript
+function generateUnsubscribeLink(
+  baseUrl: string,
+  email: string,
+  token: string
+): string
+```
+
+### generateTrackingPixel
+
+Generate tracking pixel URL for email open tracking.
+
+```typescript
+function generateTrackingPixel(
+  baseUrl: string,
+  emailId: string,
+  recipientId: string
+): string
+```
+
+### addUtmParams
+
+Add UTM parameters to URLs in HTML content.
+
+```typescript
+function addUtmParams(
+  url: string,
+  utmParams: Record<string, string>
+): string
+```
+
+## File Utilities
+
+### getMimeType
+
+Get MIME type from file extension.
+
+```typescript
+function getMimeType(filename: string): string
+```
+
+**Parameters:**
+<ParamField path="filename" type="string" required>
+  Filename to check
+</ParamField>
+
+**Returns:**
+<ResponseField name="mimeType" type="string">
+  Detected MIME type
+</ResponseField>
+
+**Example:**
+```typescript
+getMimeType('document.pdf')
+// Returns: 'application/pdf'
+```
+
+### formatFileSize
+
+Format file size in human-readable format.
+
+```typescript
+function formatFileSize(bytes: number, decimals?: number): string
+```
+
+**Parameters:**
+<ParamField path="bytes" type="number" required>
+  Size in bytes
+</ParamField>
+<ParamField path="decimals" type="number" default="2">
+  Number of decimal places
+</ParamField>
+
+**Returns:**
+<ResponseField name="formatted" type="string">
+  Formatted string (e.g. "1.5 MB")
+</ResponseField>
+
+**Example:**
+```typescript
+formatFileSize(1024 * 1024)
+// Returns: '1.00 MB'
+```
+
+## Result Types
+
+### EmailResult
+
+```typescript
+interface EmailResult {
+  success: boolean
+  messageId?: string
+  error?: string
+  metadata?: Record<string, unknown>
+}
+```
+
+### BulkEmailResult
+
+```typescript
+interface BulkEmailResult {
+  success: boolean
+  total: number
+  sent: number
+  failed: number
+  results: EmailResult[]
+  errors: Array<{
+    index: number
+    error: string
+  }>
+}
+```
+
+## React Components Export
+
+The package re-exports all components from `@react-email/components` for use in email templates:
+
+```typescript
+import {
+  Html,
+  Head,
+  Body,
+  Container,
+  Section,
+  Row,
+  Column,
+  Text,
+  Heading,
+  Link,
+  Button,
+  Img,
+  Hr,
+  Font,
+  Preview,
+  // ... and many more
+} from '@pelatform/email/components';
+```
+
+## Environment Variables
+
+### Resend Configuration
+
+```bash .env
+PELATFORM_EMAIL_RESEND_API_KEY=re_1234567890abcdef
+PELATFORM_EMAIL_FROM_NAME=Your App Name
+PELATFORM_EMAIL_FROM_EMAIL=noreply@yourapp.com
+PELATFORM_EMAIL_REPLY_TO=support@yourapp.com
+```
+
+### SMTP/Nodemailer Configuration
+
+```bash .env
+PELATFORM_EMAIL_SMTP_HOST=smtp.gmail.com
+PELATFORM_EMAIL_SMTP_PORT=587
+PELATFORM_EMAIL_SMTP_SECURE=false
+PELATFORM_EMAIL_SMTP_USER=your-email@gmail.com
+PELATFORM_EMAIL_SMTP_PASS=your-app-password
+PELATFORM_EMAIL_FROM_NAME=Your App Name
+PELATFORM_EMAIL_FROM_EMAIL=noreply@yourapp.com
+PELATFORM_EMAIL_REPLY_TO=support@yourapp.com
+```
+
+## Error Handling
+
+All methods return structured results with error information:
+
+```typescript
+const result = await emailService.sendEmail(options);
+
+if (result.success) {
+  console.log('Email sent:', result.messageId);
+} else {
+  console.error('Failed to send email:', result.error);
+}
+```
+
+Common error scenarios:
+- Invalid configuration
+- Authentication failure
+- Rate limiting
+- Invalid recipient email
+- Attachment size limits
+- Template rendering errors

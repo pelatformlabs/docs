@@ -1,0 +1,1510 @@
+---
+title: 'Examples'
+description: 'Real-world storage implementation examples using Pelatform Storage package for SaaS applications'
+keywords: ["storage", "s3", "cloudinary", "minio", "digitalocean", "supabase", "cloudflare-r2", "aws", "file-upload", "saas", "examples"]
+---
+
+Real-world implementation examples showing how to use Pelatform Storage package in production scenarios. Each example includes complete, working code that you can adapt for your applications.
+
+## SaaS File Management
+
+### User Avatar Upload System
+
+```typescript avatar-upload.ts
+import { createS3 } from '@pelatform/storage/s3';
+import { 
+  generateFileKey, 
+  validateFileSize, 
+  getMimeType, 
+  sanitizeFileName 
+} from '@pelatform/storage/helpers';
+
+const storage = createS3();
+
+class AvatarService {
+  private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
+
+  async uploadAvatar(userId: string, file: File): Promise<AvatarUploadResult> {
+    try {
+      // Validate file
+      const sizeValidation = validateFileSize(file.size, this.maxFileSize);
+      if (!sizeValidation.valid) {
+        throw new Error(`File too large. Maximum size: ${this.maxFileSize / 1024 / 1024}MB`);
+      }
+
+      if (!this.allowedMimeTypes.includes(file.type)) {
+        throw new Error('Invalid file type. Only JPEG, PNG, and WebP are allowed.');
+      }
+
+      // Generate unique filename
+      const sanitizedFilename = sanitizeFileName(file.name);
+      const uniqueKey = generateFileKey(sanitizedFilename, `avatars/${userId}`);
+
+      // Convert file to buffer
+      const buffer = await file.arrayBuffer();
+
+      // Upload to storage
+      const uploadResult = await storage.upload({
+        key: uniqueKey,
+        file: Buffer.from(buffer),
+        contentType: file.type,
+        metadata: {
+          userId,
+          originalName: file.name,
+          uploadedAt: new Date().toISOString(),
+          fileType: 'avatar'
+        },
+        cacheControl: 'public, max-age=31536000', // 1 year cache
+        acl: 'public-read'
+      });
+
+      if (!uploadResult.success) {
+        throw new Error(`Upload failed: ${uploadResult.error}`);
+      }
+
+      // Delete old avatar if exists
+      await this.deleteOldAvatar(userId);
+
+      // Save avatar reference to database
+      await this.saveAvatarReference(userId, {
+        key: uniqueKey,
+        url: uploadResult.publicUrl!,
+        size: file.size,
+        mimeType: file.type
+      });
+
+      return {
+        success: true,
+        url: uploadResult.publicUrl!,
+        key: uniqueKey
+      };
+
+    } catch (error) {
+      console.error('Avatar upload failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async deleteOldAvatar(userId: string): Promise<void> {
+    try {
+      // Get current avatar from database
+      const currentAvatar = await this.getCurrentAvatar(userId);
+
+      if (currentAvatar) {
+        // Delete from storage
+        await storage.delete({ key: currentAvatar.key });
+        // Remove from database
+        await this.deleteAvatarReference(userId);
+      }
+    } catch (error) {
+      console.error('Failed to delete old avatar:', error);
+    }
+  }
+
+  async getAvatarUrl(userId: string): Promise<string | null> {
+    const avatar = await this.getCurrentAvatar(userId);
+    return avatar?.url || null;
+  }
+
+  private async saveAvatarReference(userId: string, avatarData: AvatarData): Promise<void> {
+    // Database implementation would go here
+    console.log(`Saving avatar reference for user ${userId}:`, avatarData);
+  }
+
+  private async getCurrentAvatar(userId: string): Promise<AvatarData | null> {
+    // Database implementation would go here
+    return null;
+  }
+
+  private async deleteAvatarReference(userId: string): Promise<void> {
+    // Database implementation would go here
+    console.log(`Deleting avatar reference for user ${userId}`);
+  }
+}
+
+interface AvatarUploadResult {
+  success: boolean;
+  url?: string;
+  key?: string;
+  error?: string;
+}
+
+interface AvatarData {
+  key: string;
+  url: string;
+  size: number;
+  mimeType: string;
+}
+```
+
+### Document Management System
+
+```typescript document-manager.ts
+import { createS3 } from '@pelatform/storage/s3';
+import { generateFileKey, validateFileSize } from '@pelatform/storage/helpers';
+
+const storage = createS3();
+
+class DocumentService {
+  private readonly maxFileSize = 50 * 1024 * 1024; // 50MB
+  private readonly allowedExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+
+  async uploadDocument(
+    companyId: string,
+    file: File,
+    metadata: DocumentMetadata
+  ): Promise<DocumentUploadResult> {
+    try {
+      // Validate file
+      if (!this.isValidDocumentFile(file)) {
+        throw new Error('Invalid document file type');
+      }
+
+      const sizeValidation = validateFileSize(file.size, this.maxFileSize);
+      if (!sizeValidation.valid) {
+        throw new Error(`File too large. Maximum size: ${this.maxFileSize / 1024 / 1024}MB`);
+      }
+
+      // Generate structured file path
+      const fileExtension = file.name.substring(file.name.lastIndexOf('.'));
+      const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const uniqueKey = `documents/${companyId}/${timestamp}/${generateFileKey(file.name)}`;
+
+      // Convert file to buffer
+      const buffer = await file.arrayBuffer();
+
+      // Upload with metadata
+      const uploadResult = await storage.upload({
+        key: uniqueKey,
+        file: Buffer.from(buffer),
+        contentType: file.type,
+        metadata: {
+          companyId,
+          category: metadata.category,
+          department: metadata.department,
+          confidential: metadata.confidential.toString(),
+          uploadedBy: metadata.uploadedBy,
+          tags: metadata.tags.join(','),
+          originalName: file.name
+        },
+        cacheControl: 'private, max-age=86400', // 1 day cache
+        acl: 'private'
+      });
+
+      if (!uploadResult.success) {
+        throw new Error(`Upload failed: ${uploadResult.error}`);
+      }
+
+      // Save document record
+      const documentRecord = await this.saveDocumentRecord({
+        id: generateId(),
+        companyId,
+        key: uniqueKey,
+        originalName: file.name,
+        size: file.size,
+        mimeType: file.type,
+        category: metadata.category,
+        department: metadata.department,
+        confidential: metadata.confidential,
+        uploadedBy: metadata.uploadedBy,
+        tags: metadata.tags,
+        uploadedAt: new Date()
+      });
+
+      return {
+        success: true,
+        document: documentRecord
+      };
+
+    } catch (error) {
+      console.error('Document upload failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async getDownloadUrl(documentId: string, userId: string): Promise<string | null> {
+    try {
+      const document = await this.getDocumentRecord(documentId);
+
+      if (!document) {
+        throw new Error('Document not found');
+      }
+
+      // Check user permissions
+      if (!await this.hasDownloadPermission(document, userId)) {
+        throw new Error('Access denied');
+      }
+
+      // Generate presigned URL (valid for 5 minutes)
+      const urlResult = await storage.getPresignedUrl({
+        key: document.key,
+        operation: 'get',
+        expiresIn: 300 // 5 minutes
+      });
+
+      if (!urlResult.success) {
+        throw new Error(`Failed to generate download URL: ${urlResult.error}`);
+      }
+
+      // Log download
+      await this.logDocumentAccess(documentId, userId, 'download');
+
+      return urlResult.url;
+
+    } catch (error) {
+      console.error('Failed to get download URL:', error);
+      return null;
+    }
+  }
+
+  async deleteDocument(documentId: string, userId: string): Promise<boolean> {
+    try {
+      const document = await this.getDocumentRecord(documentId);
+
+      if (!document) {
+        throw new Error('Document not found');
+      }
+
+      // Check user permissions
+      if (!await this.hasDeletePermission(document, userId)) {
+        throw new Error('Access denied');
+      }
+
+      // Delete from storage
+      const deleteResult = await storage.delete({ key: document.key });
+
+      if (!deleteResult.success) {
+        throw new Error(`Failed to delete file: ${deleteResult.error}`);
+      }
+
+      // Mark as deleted in database (soft delete)
+      await this.markDocumentAsDeleted(documentId);
+
+      return true;
+
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+      return false;
+    }
+  }
+
+  async listCompanyDocuments(
+    companyId: string,
+    filters: DocumentFilters
+  ): Promise<DocumentListResult> {
+    try {
+      // List files from storage
+      const storageResult = await storage.list({
+        prefix: `documents/${companyId}/`,
+        maxKeys: 1000
+      });
+
+      if (!storageResult.success) {
+        throw new Error(`Failed to list files: ${storageResult.error}`);
+      }
+
+      // Get document records from database
+      const documents = await this.getDocumentRecords(companyId, filters);
+
+      return {
+        success: true,
+        documents,
+        totalCount: documents.length
+      };
+
+    } catch (error) {
+      console.error('Failed to list documents:', error);
+      return {
+        success: false,
+        documents: [],
+        totalCount: 0,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  private isValidDocumentFile(file: File): boolean {
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    return this.allowedExtensions.includes(fileExtension);
+  }
+
+  private async saveDocumentRecord(documentData: any): Promise<any> {
+    // Database implementation would go here
+    return documentData;
+  }
+
+  private async getDocumentRecord(documentId: string): Promise<any> {
+    // Database implementation would go here
+    return null;
+  }
+
+  private async hasDownloadPermission(document: any, userId: string): Promise<boolean> {
+    // Permission checking logic would go here
+    return true;
+  }
+
+  private async hasDeletePermission(document: any, userId: string): Promise<boolean> {
+    // Permission checking logic would go here
+    return true;
+  }
+
+  private async logDocumentAccess(documentId: string, userId: string, action: string): Promise<void> {
+    // Audit logging implementation would go here
+    console.log(`User ${userId} ${action} document ${documentId}`);
+  }
+
+  private async markDocumentAsDeleted(documentId: string): Promise<void> {
+    // Database implementation would go here
+    console.log(`Marking document ${documentId} as deleted`);
+  }
+
+  private async getDocumentRecords(companyId: string, filters: DocumentFilters): Promise<any[]> {
+    // Database implementation would go here
+    return [];
+  }
+
+  private generateId(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  }
+}
+
+interface DocumentMetadata {
+  category: string;
+  department: string;
+  confidential: boolean;
+  uploadedBy: string;
+  tags: string[];
+}
+
+interface DocumentFilters {
+  category?: string;
+  department?: string;
+  uploadedBy?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+}
+
+interface DocumentUploadResult {
+  success: boolean;
+  document?: any;
+  error?: string;
+}
+
+interface DocumentListResult {
+  success: boolean;
+  documents: any[];
+  totalCount: number;
+  error?: string;
+}
+```
+
+## E-commerce Product Images
+
+### Product Gallery Management
+
+```typescript product-gallery.ts
+import { createCloudinary } from '@pelatform/storage/cloudinary';
+import { createS3 } from '@pelatform/storage/s3';
+
+// Use Cloudinary for product images with transformations
+const imageStorage = createCloudinary();
+// Use S3 for other assets
+const assetStorage = createS3();
+
+class ProductImageService {
+  private readonly imageSizes = {
+    thumbnail: { width: 150, height: 150, crop: 'fill' },
+    small: { width: 300, height: 300, crop: 'fill' },
+    medium: { width: 600, height: 600, crop: 'fill' },
+    large: { width: 1200, height: 1200, crop: 'fill' }
+  };
+
+  async uploadProductImages(
+    productId: string,
+    files: File[],
+    metadata: ProductImageMetadata
+  ): Promise<ProductImageUploadResult> {
+    try {
+      const uploadedImages: ProductImage[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        if (!this.isValidImageFile(file)) {
+          throw new Error(`Invalid image file: ${file.name}`);
+        }
+
+        // Generate unique filename
+        const timestamp = Date.now();
+        const filename = `product-${productId}-${timestamp}-${i}.${this.getFileExtension(file.type)}`;
+
+        // Convert file to buffer
+        const buffer = await file.arrayBuffer();
+
+        // Upload to Cloudinary
+        const uploadResult = await imageStorage.upload({
+          key: `products/${productId}/${filename}`,
+          file: Buffer.from(buffer),
+          contentType: file.type,
+          metadata: {
+            productId,
+            isPrimary: (i === 0).toString(),
+            alt: metadata.altText || `Product image ${i + 1}`,
+            tags: `product,${productId},e-commerce`
+          }
+        });
+
+        if (!uploadResult.success) {
+          throw new Error(`Failed to upload image ${file.name}: ${uploadResult.error}`);
+        }
+
+        // Generate URLs for different sizes
+        const imageUrls: ImageUrls = {};
+        for (const [size, options] of Object.entries(this.imageSizes)) {
+          imageUrls[size as keyof ImageUrls] = this.generateTransformedUrl(
+            uploadResult.key!,
+            options
+          );
+        }
+
+        const productImage: ProductImage = {
+          id: this.generateId(),
+          productId,
+          key: uploadResult.key!,
+          originalUrl: uploadResult.publicUrl!,
+          urls: imageUrls,
+          isPrimary: i === 0,
+          sortOrder: i,
+          altText: metadata.altText || `Product image ${i + 1}`,
+          fileSize: file.size,
+          mimeType: file.type,
+          createdAt: new Date()
+        };
+
+        uploadedImages.push(productImage);
+      }
+
+      // Save to database
+      await this.saveProductImages(uploadedImages);
+
+      return {
+        success: true,
+        images: uploadedImages
+      };
+
+    } catch (error) {
+      console.error('Product image upload failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async deleteProductImage(imageId: string, productId: string): Promise<boolean> {
+    try {
+      // Get image record
+      const image = await this.getProductImage(imageId);
+
+      if (!image) {
+        throw new Error('Image not found');
+      }
+
+      // Delete from Cloudinary
+      const deleteResult = await imageStorage.delete({ key: image.key });
+
+      if (!deleteResult.success) {
+        throw new Error(`Failed to delete image: ${deleteResult.error}`);
+      }
+
+      // Remove from database
+      await this.deleteProductImageRecord(imageId);
+
+      // If this was the primary image, promote the next image
+      if (image.isPrimary) {
+        await this.promoteNextPrimaryImage(productId);
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error('Failed to delete product image:', error);
+      return false;
+    }
+  }
+
+  async reorderProductImages(
+    productId: string,
+    imageOrder: { imageId: string; sortOrder: number }[]
+  ): Promise<boolean> {
+    try {
+      for (const { imageId, sortOrder } of imageOrder) {
+        await this.updateImageSortOrder(imageId, sortOrder);
+      }
+
+      // Update primary image if needed
+      const firstImage = imageOrder.find(img => img.sortOrder === 0);
+      if (firstImage) {
+        await this.setPrimaryImage(firstImage.imageId);
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error('Failed to reorder product images:', error);
+      return false;
+    }
+  }
+
+  async optimizeProductImages(productId: string): Promise<OptimizationResult> {
+    try {
+      const images = await this.getProductImages(productId);
+      let optimizedCount = 0;
+
+      for (const image of images) {
+        // Generate optimized versions
+        const optimizedUrls: ImageUrls = {};
+
+        for (const [size, options] of Object.entries(this.imageSizes)) {
+          optimizedUrls[size as keyof ImageUrls] = this.generateOptimizedUrl(
+            image.key,
+            options,
+            {
+              quality: 'auto',
+              format: 'auto'
+            }
+          );
+        }
+
+        // Update image record with optimized URLs
+        await this.updateImageUrls(image.id, optimizedUrls);
+        optimizedCount++;
+      }
+
+      return {
+        success: true,
+        optimizedCount,
+        totalCount: images.length
+      };
+
+    } catch (error) {
+      console.error('Failed to optimize product images:', error);
+      return {
+        success: false,
+        optimizedCount: 0,
+        totalCount: 0,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  private isValidImageFile(file: File): boolean {
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    return validTypes.includes(file.type);
+  }
+
+  private getFileExtension(mimeType: string): string {
+    const extensions: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp'
+    };
+    return extensions[mimeType] || 'jpg';
+  }
+
+  private generateTransformedUrl(key: string, options: any): string {
+    // Cloudinary URL transformation logic
+    const baseUrl = imageStorage.getPublicUrl(key);
+    const params = new URLSearchParams({
+      w: options.width.toString(),
+      h: options.height.toString(),
+      c: options.crop,
+      f: 'auto',
+      q: 'auto'
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  private generateOptimizedUrl(key: string, options: any, extraOptions: any): string {
+    // Generate optimized URL with additional parameters
+    const baseUrl = imageStorage.getPublicUrl(key);
+    const params = new URLSearchParams({
+      w: options.width.toString(),
+      h: options.height.toString(),
+      c: options.crop,
+      f: extraOptions.format || 'auto',
+      q: extraOptions.quality || 'auto'
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  private async saveProductImages(images: ProductImage[]): Promise<void> {
+    // Database implementation would go here
+    console.log(`Saving ${images.length} product images`);
+  }
+
+  private async getProductImage(imageId: string): Promise<ProductImage | null> {
+    // Database implementation would go here
+    return null;
+  }
+
+  private async deleteProductImageRecord(imageId: string): Promise<void> {
+    // Database implementation would go here
+    console.log(`Deleting product image record: ${imageId}`);
+  }
+
+  private async promoteNextPrimaryImage(productId: string): Promise<void> {
+    // Database implementation would go here
+    console.log(`Promoting next primary image for product: ${productId}`);
+  }
+
+  private async getProductImages(productId: string): Promise<ProductImage[]> {
+    // Database implementation would go here
+    return [];
+  }
+
+  private async updateImageSortOrder(imageId: string, sortOrder: number): Promise<void> {
+    // Database implementation would go here
+    console.log(`Updating image sort order: ${imageId} -> ${sortOrder}`);
+  }
+
+  private async setPrimaryImage(imageId: string): Promise<void> {
+    // Database implementation would go here
+    console.log(`Setting primary image: ${imageId}`);
+  }
+
+  private async updateImageUrls(imageId: string, urls: ImageUrls): Promise<void> {
+    // Database implementation would go here
+    console.log(`Updating image URLs: ${imageId}`);
+  }
+
+  private generateId(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  }
+}
+
+interface ProductImageMetadata {
+  altText?: string;
+}
+
+interface ProductImageUploadResult {
+  success: boolean;
+  images?: ProductImage[];
+  error?: string;
+}
+
+interface ProductImage {
+  id: string;
+  productId: string;
+  key: string;
+  originalUrl: string;
+  urls: ImageUrls;
+  isPrimary: boolean;
+  sortOrder: number;
+  altText: string;
+  fileSize: number;
+  mimeType: string;
+  createdAt: Date;
+}
+
+interface ImageUrls {
+  thumbnail?: string;
+  small?: string;
+  medium?: string;
+  large?: string;
+}
+
+interface OptimizationResult {
+  success: boolean;
+  optimizedCount: number;
+  totalCount: number;
+  error?: string;
+}
+```
+
+## Backup and Archive System
+
+### Automated Backup Service
+
+```typescript backup-service.ts
+import { createS3 } from '@pelatform/storage/s3';
+
+const backupStorage = createS3({
+  provider: 'aws',
+  region: 'us-west-2',
+  bucket: 'my-app-backups',
+  acl: 'private'
+});
+
+class BackupService {
+  async createDatabaseBackup(config: BackupConfig): Promise<BackupResult> {
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const backupKey = `database-backups/${config.environment}/${timestamp}/database.sql.gz`;
+
+      // Generate database backup
+      const backupData = await this.generateDatabaseDump(config);
+
+      // Compress backup data
+      const compressedData = await this.compressData(backupData);
+
+      // Upload to storage
+      const uploadResult = await backupStorage.upload({
+        key: backupKey,
+        file: compressedData,
+        contentType: 'application/gzip',
+        metadata: {
+          environment: config.environment,
+          database: config.databaseName,
+          timestamp: new Date().toISOString(),
+          type: 'database-backup',
+          compressed: 'true'
+        },
+        cacheControl: 'private, max-age=31536000', // 1 year
+        acl: 'private'
+      });
+
+      if (!uploadResult.success) {
+        throw new Error(`Failed to upload backup: ${uploadResult.error}`);
+      }
+
+      // Save backup record
+      const backupRecord = await this.saveBackupRecord({
+        id: this.generateId(),
+        key: backupKey,
+        type: 'database',
+        environment: config.environment,
+        size: compressedData.length,
+        createdAt: new Date(),
+        retentionDays: config.retentionDays || 30
+      });
+
+      return {
+        success: true,
+        backup: backupRecord
+      };
+
+    } catch (error) {
+      console.error('Database backup failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async createUserFilesBackup(userId: string, config: UserBackupConfig): Promise<BackupResult> {
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const backupKey = `user-backups/${userId}/${timestamp}/user-files.zip`;
+
+      // Collect user files
+      const userFiles = await this.collectUserFiles(userId, config.includeDirectories);
+
+      // Create ZIP archive
+      const zipData = await this.createZipArchive(userFiles);
+
+      // Upload to storage
+      const uploadResult = await backupStorage.upload({
+        key: backupKey,
+        file: zipData,
+        contentType: 'application/zip',
+        metadata: {
+          userId,
+          type: 'user-files-backup',
+          timestamp: new Date().toISOString(),
+          fileCount: userFiles.length.toString(),
+          directories: config.includeDirectories.join(',')
+        },
+        cacheControl: 'private, max-age=31536000',
+        acl: 'private'
+      });
+
+      if (!uploadResult.success) {
+        throw new Error(`Failed to upload user backup: ${uploadResult.error}`);
+      }
+
+      // Save backup record
+      const backupRecord = await this.saveBackupRecord({
+        id: this.generateId(),
+        key: backupKey,
+        type: 'user-files',
+        userId,
+        environment: 'production',
+        size: zipData.length,
+        createdAt: new Date(),
+        retentionDays: config.retentionDays || 90
+      });
+
+      return {
+        success: true,
+        backup: backupRecord
+      };
+
+    } catch (error) {
+      console.error('User files backup failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async restoreBackup(backupId: string, restoreConfig: RestoreConfig): Promise<RestoreResult> {
+    try {
+      // Get backup record
+      const backup = await this.getBackupRecord(backupId);
+
+      if (!backup) {
+        throw new Error('Backup not found');
+      }
+
+      // Download backup file
+      const downloadResult = await backupStorage.download({ key: backup.key });
+
+      if (!downloadResult.success) {
+        throw new Error(`Failed to download backup: ${downloadResult.error}`);
+      }
+
+      // Restore based on backup type
+      let restoreResult: any;
+
+      switch (backup.type) {
+        case 'database':
+          restoreResult = await this.restoreDatabaseBackup(
+            downloadResult.content!,
+            restoreConfig
+          );
+          break;
+
+        case 'user-files':
+          restoreResult = await this.restoreUserFilesBackup(
+            downloadResult.content!,
+            restoreConfig
+          );
+          break;
+
+        default:
+          throw new Error(`Unknown backup type: ${backup.type}`);
+      }
+
+      return {
+        success: true,
+        backupId,
+        restoredAt: new Date(),
+        details: restoreResult
+      };
+
+    } catch (error) {
+      console.error('Backup restore failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async scheduleAutomaticBackups(config: ScheduledBackupConfig): Promise<void> {
+    // This would typically be implemented with a job scheduler like cron or Bull queue
+    console.log(`Scheduling automatic backups:`, config);
+
+    // Example implementation with setInterval (use proper job scheduler in production)
+    const backupInterval = setInterval(async () => {
+      try {
+        console.log('Running automatic backup...');
+
+        // Create database backup
+        const dbBackupResult = await this.createDatabaseBackup(config.database);
+        if (dbBackupResult.success) {
+          console.log('Database backup created:', dbBackupResult.backup?.key);
+        }
+
+        // Clean up old backups
+        await this.cleanupOldBackups(config.retentionDays);
+
+        console.log('Automatic backup completed');
+      } catch (error) {
+        console.error('Automatic backup failed:', error);
+      }
+    }, config.intervalMs);
+
+    // Store interval reference for cleanup
+    this.backupIntervals.set(config.name, backupInterval);
+  }
+
+  async cleanupOldBackups(retentionDays: number): Promise<CleanupResult> {
+    try {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
+
+      // Get old backups
+      const oldBackups = await this.getOldBackups(cutoffDate);
+
+      let deletedCount = 0;
+      let failedCount = 0;
+
+      for (const backup of oldBackups) {
+        try {
+          // Delete from storage
+          const deleteResult = await backupStorage.delete({ key: backup.key });
+
+          if (deleteResult.success) {
+            // Mark as deleted in database
+            await this.markBackupAsDeleted(backup.id);
+            deletedCount++;
+          } else {
+            console.error(`Failed to delete backup ${backup.id}:`, deleteResult.error);
+            failedCount++;
+          }
+        } catch (error) {
+          console.error(`Error deleting backup ${backup.id}:`, error);
+          failedCount++;
+        }
+      }
+
+      return {
+        success: true,
+        deletedCount,
+        failedCount,
+        totalCount: oldBackups.length
+      };
+
+    } catch (error) {
+      console.error('Backup cleanup failed:', error);
+      return {
+        success: false,
+        deletedCount: 0,
+        failedCount: 0,
+        totalCount: 0,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  private async generateDatabaseDump(config: BackupConfig): Promise<Buffer> {
+    // Database-specific implementation would go here
+    // Example for PostgreSQL:
+    // return Buffer.from(await execAsync(`pg_dump ${config.databaseName} | gzip`));
+    return Buffer.from('Database dump data');
+  }
+
+  private async compressData(data: Buffer): Promise<Buffer> {
+    // Compression implementation would go here
+    // Using zlib or similar compression library
+    return data; // Placeholder
+  }
+
+  private async collectUserFiles(userId: string, directories: string[]): Promise<UserFile[]> {
+    // File collection implementation would go here
+    return [];
+  }
+
+  private async createZipArchive(files: UserFile[]): Promise<Buffer> {
+    // ZIP creation implementation would go here
+    // Using JSZip or similar library
+    return Buffer.from('ZIP archive data');
+  }
+
+  private async restoreDatabaseBackup(backupData: Buffer, config: RestoreConfig): Promise<any> {
+    // Database restore implementation would go here
+    console.log('Restoring database from backup');
+    return { restoredTables: 0 };
+  }
+
+  private async restoreUserFilesBackup(backupData: Buffer, config: RestoreConfig): Promise<any> {
+    // File restore implementation would go here
+    console.log('Restoring user files from backup');
+    return { restoredFiles: 0 };
+  }
+
+  private async saveBackupRecord(backupData: any): Promise<any> {
+    // Database implementation would go here
+    return backupData;
+  }
+
+  private async getBackupRecord(backupId: string): Promise<any> {
+    // Database implementation would go here
+    return null;
+  }
+
+  private async getOldBackups(cutoffDate: Date): Promise<any[]> {
+    // Database implementation would go here
+    return [];
+  }
+
+  private async markBackupAsDeleted(backupId: string): Promise<void> {
+    // Database implementation would go here
+    console.log(`Marking backup as deleted: ${backupId}`);
+  }
+
+  private generateId(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  }
+
+  private backupIntervals = new Map<string, NodeJS.Timeout>();
+}
+
+interface BackupConfig {
+  environment: string;
+  databaseName: string;
+  retentionDays?: number;
+}
+
+interface UserBackupConfig {
+  includeDirectories: string[];
+  retentionDays?: number;
+}
+
+interface RestoreConfig {
+  targetEnvironment?: string;
+  overwrite?: boolean;
+}
+
+interface ScheduledBackupConfig {
+  name: string;
+  intervalMs: number;
+  database: BackupConfig;
+  retentionDays: number;
+}
+
+interface BackupResult {
+  success: boolean;
+  backup?: any;
+  error?: string;
+}
+
+interface RestoreResult {
+  success: boolean;
+  backupId?: string;
+  restoredAt?: Date;
+  details?: any;
+  error?: string;
+}
+
+interface CleanupResult {
+  success: boolean;
+  deletedCount: number;
+  failedCount: number;
+  totalCount: number;
+  error?: string;
+}
+
+interface UserFile {
+  path: string;
+  content: Buffer;
+  metadata: Record<string, any>;
+}
+```
+
+## CDN Integration
+
+### Content Delivery Network Setup
+
+```typescript cdn-service.ts
+import { createS3 } from '@pelatform/storage/s3';
+import { buildPublicUrl } from '@pelatform/storage/helpers';
+
+const storage = createS3({
+  provider: 'cloudflare-r2', // Or 'aws' with CloudFront
+  region: 'auto',
+  bucket: 'my-app-cdn',
+  publicUrl: 'https://cdn.myapp.com' // Custom CDN domain
+});
+
+class CDNService {
+  async uploadStaticAsset(
+    filePath: string,
+    content: Buffer | string,
+    options: StaticAssetOptions = {}
+  ): Promise<AssetUploadResult> {
+    try {
+      // Determine content type if not provided
+      const contentType = options.contentType || this.getContentTypeFromPath(filePath);
+
+      // Generate cache control based on asset type
+      const cacheControl = this.generateCacheControl(filePath, options.cacheDuration);
+
+      // Upload to storage with CDN optimization
+      const uploadResult = await storage.upload({
+        key: filePath,
+        file: content,
+        contentType,
+        cacheControl,
+        metadata: {
+          originalPath: filePath,
+          uploadedAt: new Date().toISOString(),
+          assetType: this.getAssetType(filePath),
+          version: options.version || '1'
+        },
+        acl: 'public-read'
+      });
+
+      if (!uploadResult.success) {
+        throw new Error(`Upload failed: ${uploadResult.error}`);
+      }
+
+      // Generate CDN URLs
+      const urls = this.generateCDNUrls(filePath, options);
+
+      // Create asset record
+      const asset = await this.saveAssetRecord({
+        id: this.generateId(),
+        key: filePath,
+        originalUrl: uploadResult.publicUrl!,
+        cdnUrls: urls,
+        contentType,
+        size: typeof content === 'string' ? content.length : content.length,
+        cacheControl,
+        version: options.version || '1',
+        createdAt: new Date()
+      });
+
+      return {
+        success: true,
+        asset
+      };
+
+    } catch (error) {
+      console.error('Static asset upload failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async invalidateCDNCache(filePaths: string[]): Promise<CacheInvalidationResult> {
+    try {
+      // This would integrate with CDN provider APIs (Cloudflare, AWS CloudFront, etc.)
+
+      const invalidationPromises = filePaths.map(async (filePath) => {
+        // Cloudflare example:
+        // await this.cloudflareApi.zones.purge_cache({
+        //   files: [this.generateCDNUrl(filePath)]
+        // });
+
+        console.log(`Invalidating CDN cache for: ${filePath}`);
+
+        return {
+          filePath,
+          success: true,
+          invalidatedAt: new Date()
+        };
+      });
+
+      const results = await Promise.allSettled(invalidationPromises);
+      const invalidations = results.map((result, index) => ({
+        filePath: filePaths[index],
+        success: result.status === 'fulfilled',
+        invalidatedAt: result.status === 'fulfilled' ? result.value.invalidatedAt : null,
+        error: result.status === 'rejected' ? result.reason : null
+      }));
+
+      return {
+        success: true,
+        invalidations
+      };
+
+    } catch (error) {
+      console.error('CDN cache invalidation failed:', error);
+      return {
+        success: false,
+        invalidations: [],
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async optimizeImages(
+    images: ImageOptimizationRequest[]
+  ): Promise<ImageOptimizationResult> {
+    try {
+      const optimizedImages: OptimizedImage[] = [];
+
+      for (const image of images) {
+        // Generate optimized versions
+        const optimizedVersions = await this.generateOptimizedVersions(
+          image.key,
+          image.optimizations
+        );
+
+        const optimizedImage: OptimizedImage = {
+          id: this.generateId(),
+          originalKey: image.key,
+          optimizedVersions,
+          createdAt: new Date()
+        };
+
+        optimizedImages.push(optimizedImage);
+
+        // Update asset record
+        await this.updateAssetWithOptimizedVersions(image.assetId, optimizedVersions);
+      }
+
+      return {
+        success: true,
+        optimizedImages
+      };
+
+    } catch (error) {
+      console.error('Image optimization failed:', error);
+      return {
+        success: false,
+        optimizedImages: [],
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async generateCDNReport(timeRange: DateRange): Promise<CDNReport> {
+    try {
+      // This would integrate with CDN analytics APIs
+
+      const report: CDNReport = {
+        timeRange,
+        totalRequests: 0,
+        totalBandwidth: 0,
+        cacheHitRate: 0,
+        topFiles: [],
+        bandwidthByFileType: {},
+        requestsByRegion: {}
+      };
+
+      // Fetch real data from CDN provider
+      // Example for Cloudflare:
+      // const analytics = await this.cloudflareApi.analytics.rum.bytime.groups({
+      //   since: timeRange.start,
+      //   until: timeRange.end
+      // });
+
+      return report;
+
+    } catch (error) {
+      console.error('Failed to generate CDN report:', error);
+      throw error;
+    }
+  }
+
+  private getContentTypeFromPath(filePath: string): string {
+    const ext = filePath.split('.').pop()?.toLowerCase();
+    const contentTypes: Record<string, string> = {
+      'html': 'text/html',
+      'css': 'text/css',
+      'js': 'application/javascript',
+      'json': 'application/json',
+      'xml': 'application/xml',
+      'png': 'image/png',
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'gif': 'image/gif',
+      'svg': 'image/svg+xml',
+      'webp': 'image/webp',
+      'woff': 'font/woff',
+      'woff2': 'font/woff2',
+      'ttf': 'font/ttf',
+      'eot': 'application/vnd.ms-fontobject',
+      'pdf': 'application/pdf',
+      'zip': 'application/zip'
+    };
+
+    return contentTypes[ext || ''] || 'application/octet-stream';
+  }
+
+  private generateCacheControl(filePath: string, customDuration?: number): string {
+    const assetType = this.getAssetType(filePath);
+
+    const cacheDurations: Record<string, number> = {
+      'image': 31536000, // 1 year
+      'font': 31536000,  // 1 year
+      'css': 86400,      // 1 day
+      'js': 86400,       // 1 day
+      'html': 3600,      // 1 hour
+      'json': 3600,      // 1 hour
+      'document': 86400  // 1 day
+    };
+
+    const maxAge = customDuration || cacheDurations[assetType] || 3600;
+
+    return `public, max-age=${maxAge}, immutable`;
+  }
+
+  private getAssetType(filePath: string): string {
+    const ext = filePath.split('.').pop()?.toLowerCase();
+
+    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext || '')) return 'image';
+    if (['woff', 'woff2', 'ttf', 'eot'].includes(ext || '')) return 'font';
+    if (['css'].includes(ext || '')) return 'css';
+    if (['js'].includes(ext || '')) return 'js';
+    if (['html'].includes(ext || '')) return 'html';
+    if (['json'].includes(ext || '')) return 'json';
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(ext || '')) return 'document';
+
+    return 'other';
+  }
+
+  private generateCDNUrls(filePath: string, options: StaticAssetOptions): CDNUrls {
+    const baseUrl = storage.getPublicUrl(filePath);
+
+    return {
+      http: baseUrl,
+      https: baseUrl.replace('http://', 'https://'),
+      withVersion: options.version ? `${baseUrl}?v=${options.version}` : baseUrl,
+      optimized: options.optimize ? `${baseUrl}?auto=compress,format` : baseUrl
+    };
+  }
+
+  private async generateOptimizedVersions(
+    key: string,
+    optimizations: ImageOptimization[]
+  ): Promise<OptimizedVersion[]> {
+    const versions: OptimizedVersion[] = [];
+
+    for (const opt of optimizations) {
+      const optimizedKey = this.generateOptimizedKey(key, opt);
+      const optimizedUrl = this.generateOptimizedUrl(optimizedKey, opt);
+
+      versions.push({
+        name: opt.name,
+        key: optimizedKey,
+        url: optimizedUrl,
+        width: opt.width,
+        height: opt.height,
+        quality: opt.quality,
+        format: opt.format
+      });
+    }
+
+    return versions;
+  }
+
+  private generateOptimizedKey(originalKey: string, optimization: ImageOptimization): string {
+    const ext = originalKey.split('.').pop();
+    const name = originalKey.replace(`.${ext}`, '');
+    return `${name}_${optimization.name}.${optimization.format || ext}`;
+  }
+
+  private generateOptimizedUrl(key: string, optimization: ImageOptimization): string {
+    const baseUrl = storage.getPublicUrl(key);
+    const params = new URLSearchParams();
+
+    if (optimization.width) params.set('w', optimization.width.toString());
+    if (optimization.height) params.set('h', optimization.height.toString());
+    if (optimization.quality) params.set('q', optimization.quality.toString());
+    if (optimization.format) params.set('f', optimization.format);
+
+    return params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+  }
+
+  private async saveAssetRecord(assetData: any): Promise<any> {
+    // Database implementation would go here
+    return assetData;
+  }
+
+  private async updateAssetWithOptimizedVersions(assetId: string, versions: OptimizedVersion[]): Promise<void> {
+    // Database implementation would go here
+    console.log(`Updating asset ${assetId} with optimized versions`);
+  }
+
+  private generateId(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  }
+}
+
+interface StaticAssetOptions {
+  contentType?: string;
+  cacheDuration?: number;
+  version?: string;
+  optimize?: boolean;
+}
+
+interface AssetUploadResult {
+  success: boolean;
+  asset?: any;
+  error?: string;
+}
+
+interface CDNUrls {
+  http: string;
+  https: string;
+  withVersion?: string;
+  optimized?: string;
+}
+
+interface CacheInvalidationResult {
+  success: boolean;
+  invalidations: Array<{
+    filePath: string;
+    success: boolean;
+    invalidatedAt?: Date;
+    error?: any;
+  }>;
+  error?: string;
+}
+
+interface ImageOptimizationRequest {
+  key: string;
+  assetId: string;
+  optimizations: ImageOptimization[];
+}
+
+interface ImageOptimization {
+  name: string;
+  width?: number;
+  height?: number;
+  quality?: number;
+  format?: string;
+}
+
+interface ImageOptimizationResult {
+  success: boolean;
+  optimizedImages: OptimizedImage[];
+  error?: string;
+}
+
+interface OptimizedImage {
+  id: string;
+  originalKey: string;
+  optimizedVersions: OptimizedVersion[];
+  createdAt: Date;
+}
+
+interface OptimizedVersion {
+  name: string;
+  key: string;
+  url: string;
+  width?: number;
+  height?: number;
+  quality?: number;
+  format?: string;
+}
+
+interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+interface CDNReport {
+  timeRange: DateRange;
+  totalRequests: number;
+  totalBandwidth: number;
+  cacheHitRate: number;
+  topFiles: Array<{
+    path: string;
+    requests: number;
+    bandwidth: number;
+  }>;
+  bandwidthByFileType: Record<string, number>;
+  requestsByRegion: Record<string, number>;
+}
+```
+
+These examples demonstrate real-world scenarios you might encounter when implementing storage functionality in your SaaS applications. Each example includes proper error handling, security considerations, and follows best practices for cloud storage management.

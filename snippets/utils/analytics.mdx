@@ -1,0 +1,39 @@
+<Tabs>
+  <Tab title="Google">
+    ```typescript google.ts
+    import {
+      googleTrackEvent,
+      googleTrackCodeCopy,
+      googleTrackThemeChange,
+      googleTrackDirectionChange,
+      googleTrackViewChange,
+      googleTrackItemCreate,
+      googleTrackItemView,
+      googleTrackItemUpdate,
+      googleTrackItemDelete,
+      googleTrackItemRestore
+    } from '@pelatform/utils';
+
+    // Interface for event tracking parameters
+    interface EventProps {
+      name: string;
+      properties?: Record<string, string | number | boolean>;
+    }
+
+    // Track custom event
+    googleTrackEvent({
+      name: 'custom_action',
+      properties: { category: 'user', label: 'button_click' }
+    });
+
+    // Track code copy
+    googleTrackCodeCopy('components/Button');
+
+    // Track CRUD operations
+    googleTrackItemCreate('users', 'user', '123');
+    googleTrackItemView('users', 'user', '123');
+    googleTrackItemUpdate('users', 'user', '123');
+    googleTrackItemDelete('users', 'user', '123');
+    ```
+  </Tab>
+</Tabs>

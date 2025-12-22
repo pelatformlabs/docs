@@ -1,0 +1,205 @@
+<Tabs>
+  <Tab title="Assets">
+    ```typescript assets.ts
+    import { assetsUrl, getFlagUrl } from '@pelatform/utils';
+
+    // Build absolute asset URL
+    const url = assetsUrl('logo/logo.png');
+    // "https://assets.pelatform.com/logo/logo.png"
+
+    // Custom host
+    const customUrl = assetsUrl('/images/icon.svg', 'https://cdn.example.com');
+    // "https://cdn.example.com/images/icon.svg"
+
+    // Get country flag URL
+    const flagUrl = getFlagUrl('US');
+    // "https://assets.pelatform.com/media/flags/us.svg"
+    ```
+  </Tab>
+
+  <Tab title="Auth">
+    ```typescript auth.ts
+    import { getSizeAvatar, getUserName } from '@pelatform/utils';
+
+    // Get avatar size class
+    const smSize = getSizeAvatar('sm'); // "size-6"
+    const lgSize = getSizeAvatar('lg'); // "size-10"
+    const defaultSize = getSizeAvatar(null); // "size-8"
+
+    // Get user name from object
+    const user = { displayUsername: 'johndoe' };
+    const name = getUserName(user); // "johndoe"
+    ```
+  </Tab>
+
+  <Tab title="Camel Case">
+    ```typescript camel-case.ts
+    import { toCamelCase } from '@pelatform/utils';
+
+    // Convert snake_case to camelCase
+    const camel = toCamelCase('user_name');
+    // "userName"
+
+    // Already camelCase
+    const same = toCamelCase('userName');
+    // "userName"
+    ```
+  </Tab>
+
+  <Tab title="Capitalize">
+    ```typescript capitalize.ts
+    import { capitalize } from '@pelatform/utils';
+
+    // Capitalize first letter of words
+    const title = capitalize('hello world');
+    // "Hello World"
+
+    // Handle null/undefined
+    const empty = capitalize(null);
+    // null
+    ```
+  </Tab>
+
+  <Tab title="CN (ClassNames)">
+    ```typescript cn.ts
+    import { cn } from '@pelatform/utils';
+
+    // Merge Tailwind classes with conflict resolution
+    const className = cn(
+      "px-4 py-2",
+      "bg-blue-500",
+      true && "text-white",
+      false && "rounded"
+    );
+    // "px-4 py-2 bg-blue-500 text-white"
+
+    // Resolves conflicts (last wins)
+    const btnClass = cn("px-2", "px-4");
+    // "px-4"
+    ```
+  </Tab>
+
+  <Tab title="Combine Words">
+    ```typescript combine-words.ts
+    import { combineWords } from '@pelatform/utils';
+
+    // Combine words with natural language
+    const list = combineWords(['apple', 'banana', 'orange']);
+    // "apple, banana and orange"
+
+    const pair = combineWords(['apple', 'banana']);
+    // "apple and banana"
+    ```
+  </Tab>
+
+  <Tab title="Currency">
+    ```typescript currency-formatter.ts
+    import { currencyFormatter } from '@pelatform/utils';
+
+    // Default USD
+    const price = currencyFormatter(1000);
+    // "$1,000"
+
+    // Custom currency and locale
+    const euros = currencyFormatter(1000, {}, 'de-DE', 'EUR');
+    // "1.000 €"
+    ```
+  </Tab>
+
+  <Tab title="Initials">
+    ```typescript get-initials.ts
+    import { getInitials } from '@pelatform/utils';
+
+    // Get initials from name
+    const initials = getInitials('John Doe');
+    // "JD"
+
+    // Limit number of initials
+    const limited = getInitials('John Michael Doe', 2);
+    // "JM"
+    ```
+  </Tab>
+
+  <Tab title="Number Format">
+    ```typescript nformatter.ts
+    import { nFormatter } from '@pelatform/utils';
+
+    // Format with abbreviations
+    const k = nFormatter(1500);
+    // "1.5K"
+
+    const m = nFormatter(1500000);
+    // "1.5M"
+
+    // Full number
+    const full = nFormatter(1500, { full: true });
+    // "1,500"
+    ```
+  </Tab>
+
+  <Tab title="Normalize">
+    ```typescript normalize-string.ts
+    import { normalizeString } from '@pelatform/utils';
+
+    // Normalize string (remove special chars, trim, lowercase)
+    const normalized = normalizeString('  Hello   World  ');
+    // "hello world"
+    ```
+  </Tab>
+
+  <Tab title="Pluralize">
+    ```typescript pluralize.ts
+    import { pluralize } from '@pelatform/utils';
+
+    // Simple pluralization
+    const item = pluralize('item', 1); // "item"
+    const items = pluralize('item', 2); // "items"
+
+    // Custom plural
+    const categories = pluralize('category', 2, { plural: 'categories' });
+    // "categories"
+    ```
+  </Tab>
+
+  <Tab title="Regex Escape">
+    ```typescript regex-escape.ts
+    import { regexEscape } from '@pelatform/utils';
+
+    // Escape special regex characters
+    const safe = regexEscape('hello.world');
+    // "hello\.world"
+
+    const regex = new RegExp(regexEscape('user+input'));
+    ```
+  </Tab>
+
+  <Tab title="Smart Truncate">
+    ```typescript smart-truncate.ts
+    import { smartTruncate } from '@pelatform/utils';
+
+    // Truncate URL preserving domain and important parts
+    const url = smartTruncate('example.com/very/long/path/to/resource', 25);
+    // "exam...com/very/long/path/to"
+    ```
+  </Tab>
+
+  <Tab title="Trim">
+    ```typescript trim.ts
+    import { trim } from '@pelatform/utils';
+
+    // Type-safe trim
+    const str = trim('  hello  '); // "hello"
+    const num = trim(123); // 123
+    ```
+  </Tab>
+
+  <Tab title="Truncate">
+    ```typescript truncate.ts
+    import { truncate } from '@pelatform/utils';
+
+    // Simple string truncation
+    const text = truncate('This is a long string', 10);
+    // "This is..."
+    ```
+  </Tab>
+</Tabs>

@@ -1,0 +1,112 @@
+<Tabs>
+  <Tab title="Core">
+    ```typescript
+    import {
+      // Theme
+      THEME_MODES,
+      META_THEME_COLORS,
+      DEFAULT_THEME_MODE,
+      // Environment
+      isDevelopment,
+      isStaging,
+      isProduction,
+      NODE_ENV,
+      // Configuration
+      NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+      SLACK_WEBHOOKS,
+      OG_AVATAR_URL,
+      PAGINATION_LIMIT,
+      TWO_WEEKS_IN_SECONDS,
+      THE_BEGINNING_OF_TIME,
+      INFINITY_NUMBER,
+      REDIRECT_QUERY_PARAM,
+      LAST_VISITED_WORKSPACE,
+      // Server / Debug
+      PORT,
+      API_PORT,
+      DEBUG,
+      LOG_LEVEL,
+      // Animation
+      FRAMER_MOTION_LIST_ITEM_VARIANTS,
+      STAGGER_CHILD_VARIANTS,
+      TAB_ITEM_ANIMATION_SETTINGS,
+      // Localhost
+      LOCALHOST_GEO_DATA,
+      LOCALHOST_IP,
+      // Validation
+      RESERVED_SLUGS
+    } from '@pelatform/utils';
+
+    // Check environment
+    if (isDevelopment) {
+      console.log('Running in dev mode');
+    }
+
+    // Use theme constants
+    const currentTheme = THEME_MODES.DARK; // "dark"
+    const themeColor = META_THEME_COLORS[THEME_MODES.LIGHT]; // "#ffffff"
+
+    // Check for reserved slugs
+    const isReserved = RESERVED_SLUGS.includes('admin'); // true
+
+    // Localhost data for testing
+    const defaultLocation = isDevelopment ? LOCALHOST_GEO_DATA : userLocation;
+
+    // Server configuration
+    const serverPort = PORT || 3000;
+
+    // Debug logging
+    if (DEBUG) {
+      console.debug('Debug mode enabled');
+    }
+    ```
+  </Tab>
+
+  <Tab title="Country">
+    ```typescript
+    import {
+      COUNTRIES,
+      CONTINENTS,
+      CONTINENT_CODES,
+      REGIONS,
+      COUNTRY_PHONE_CODES,
+      CONNECT_SUPPORTED_COUNTRIES,
+      COUNTRY_CODES,
+      EU_COUNTRY_CODES
+    } from '@pelatform/utils';
+
+    // Get country name
+    const countryName = COUNTRIES['US']; // "United States"
+
+    // Get phone code
+    const phoneCode = COUNTRY_PHONE_CODES['ID']; // 62
+
+    // Check supported country
+    if (CONNECT_SUPPORTED_COUNTRIES.includes('US')) {
+      console.log('Country supported');
+    }
+
+    // Check for EU country (e.g. for GDPR)
+    const isGDPR = EU_COUNTRY_CODES.includes('DE'); // true
+
+    // Validate country code
+    const isValidCode = COUNTRY_CODES.includes('XX'); // false
+    ```
+  </Tab>
+
+  <Tab title="Domain">
+    ```typescript
+    import {
+      ccTLDs,
+      SECOND_LEVEL_DOMAINS,
+      SPECIAL_APEX_DOMAINS
+    } from '@pelatform/utils';
+
+    // Check if TLD is a country code
+    const isCountryTLD = ccTLDs.has('id'); // true
+
+    // Check for special domains
+    const isVercel = SPECIAL_APEX_DOMAINS.has('vercel.app'); // true
+    ```
+  </Tab>
+</Tabs>

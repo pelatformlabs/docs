@@ -9,32 +9,34 @@ import { PackageRun } from '/snippets/packagerun.jsx';
 
 Pelatform Configuration provides development environment setups with ESLint, TypeScript, and Biome configurations optimized for modern TypeScript projects.
 
-<Card title="Development Configs" icon="settings">
-  <ul>
-    <li><strong>ESLint Configurations</strong>: Modern JavaScript/TypeScript linting with React support</li>
-    <li><strong>TypeScript Configs</strong>: Optimized TypeScript configurations for different environments</li>
-    <li><strong>Biome Config</strong>: Fast formatting and linting with modern tooling</li>
-    <li><strong>Zero Setup</strong>: Works out of the box with sensible defaults</li>
-  </ul>
-</Card>
+<Columns cols={1}>
+  <Card title="Development Configs" icon="settings">
+    <ul>
+      <li><strong>ESLint Configurations</strong>: Modern JavaScript/TypeScript linting with React support</li>
+      <li><strong>TypeScript Configs</strong>: Optimized TypeScript configurations for different environments</li>
+      <li><strong>Biome Config</strong>: Fast formatting and linting with modern tooling</li>
+      <li><strong>Zero Setup</strong>: Works out of the box with sensible defaults</li>
+    </ul>
+  </Card>
 
-<Card title="Modern Standards" icon="zap">
-  <ul>
-    <li><strong>TypeScript First</strong>: Optimized for TypeScript development</li>
-    <li><strong>React Support</strong>: Built-in React best practices and hooks</li>
-    <li><strong>Performance</strong>: Fast linting and formatting with minimal overhead</li>
-    <li><strong>Editor Integration</strong>: VS Code, WebStorm, and other editor support</li>
-  </ul>
-</Card>
+  <Card title="Modern Standards" icon="zap">
+    <ul>
+      <li><strong>TypeScript First</strong>: Optimized for TypeScript development</li>
+      <li><strong>React Support</strong>: Built-in React best practices and hooks</li>
+      <li><strong>Performance</strong>: Fast linting and formatting with minimal overhead</li>
+      <li><strong>Editor Integration</strong>: VS Code, WebStorm, and other editor support</li>
+    </ul>
+  </Card>
 
-<Card title="Team Consistency" icon="users">
-  <ul>
-    <li><strong>Consistent Style</strong>: Ensures consistent code style across teams</li>
-    <li><strong>Auto-formatting</strong>: Automatic code formatting on save</li>
-    <li><strong>Import Organization</strong>: Automatic import sorting and grouping</li>
-    <li><strong>CI/CD Ready</strong>: Easy integration with GitHub Actions</li>
-  </ul>
-</Card>
+  <Card title="Team Consistency" icon="users">
+    <ul>
+      <li><strong>Consistent Style</strong>: Ensures consistent code style across teams</li>
+      <li><strong>Auto-formatting</strong>: Automatic code formatting on save</li>
+      <li><strong>Import Organization</strong>: Automatic import sorting and grouping</li>
+      <li><strong>CI/CD Ready</strong>: Easy integration with GitHub Actions</li>
+    </ul>
+  </Card>
+</Columns>
 
 ## Available Configurations
 
@@ -143,14 +145,14 @@ Pelatform Configuration provides development environment setups with ESLint, Typ
 }
 ```
 
-  ```jsonc biome.jsonc
-  {
-    "extends": ["@pelatform/biome-config/base"],
-    "files": {
-      "ignore": [".next/**/*", "out/**/*"]
-    }
+```jsonc biome.jsonc
+{
+  "extends": ["@pelatform/biome-config/base"],
+  "files": {
+    "ignore": [".next/**/*", "out/**/*"]
   }
-  ```
+}
+```
 
 ### Node.js API
 

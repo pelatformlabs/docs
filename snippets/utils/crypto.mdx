@@ -1,0 +1,113 @@
+<Tabs>
+  <Tab title="Cuid">
+    ```typescript cuid.ts
+    import { cuid, customeId, createId, initCuid } from '@pelatform/utils';
+
+    const id = cuid(); // "clhqxr8kj0000qzrmn5t8b123"
+    const userId = customeId('user_'); // "user_..."
+    ```
+  </Tab>
+
+  <Tab title="Generate Random String">
+    ```typescript generate-random-string.ts
+    // Server-side only
+    import { generateRandomString } from '@pelatform/utils/server';
+
+    const token = generateRandomString(32);
+    ```
+  </Tab>
+
+  <Tab title="Hash String">
+    ```typescript hash-string.ts
+    import { hashStringSHA256 } from '@pelatform/utils';
+
+    const hash = await hashStringSHA256('secret');
+    ```
+  </Tab>
+
+  <Tab title="JWT">
+    ```typescript jwt.ts
+    // Server-side only
+    import {
+      generateJWT,
+      verifyJWT,
+      decodeJWT,
+      isJWTExpired,
+      getJWTTimeRemaining,
+      jwt
+    } from '@pelatform/utils/server';
+
+    interface JWTPayload {
+      userId: string;
+      email: string;
+      role?: string;
+      workspaceId?: string;
+      exp?: number;
+      iat?: number;
+      [key: string]: unknown;
+    }
+
+    interface JWTOptions {
+      expiresIn?: string; // default: '7d'
+      issuer?: string;
+      audience?: string;
+    }
+
+    interface JWTVerificationResult {
+      isValid: boolean;
+      payload?: JWTPayload;
+      error?: string;
+    }
+
+    const token = generateJWT({ userId: '123' }, 'secret');
+    const verified = verifyJWT(token, 'secret');
+    ```
+  </Tab>
+
+  <Tab title="Nanoid">
+    ```typescript nanoid.ts
+    import { nanoid, uid } from '@pelatform/utils';
+
+    const id = nanoid(10); // Random alphanumeric string
+    const key = uid(); // Simple unique ID for React keys
+    ```
+  </Tab>
+
+  <Tab title="Password">
+    ```typescript password.ts
+    // Server-side only
+    import {
+      hashPassword,
+      verifyPassword,
+      needsRehash,
+      generateSecurePassword
+    } from '@pelatform/utils/server';
+
+    interface HashPasswordOptions {
+      saltRounds?: number; // default: 12
+    }
+
+    interface VerifyPasswordResult {
+      isValid: boolean;
+      error?: string;
+    }
+
+    interface GeneratePasswordOptions {
+      includeUppercase?: boolean; // default: true
+      includeLowercase?: boolean; // default: true
+      includeNumbers?: boolean;   // default: true
+      includeSymbols?: boolean;   // default: true
+    }
+
+    // Hash and verify password
+    const hash = await hashPassword('password123');
+    const isValid = await verifyPassword('password123', hash);
+
+    // Generate secure password
+    const newPassword = generateSecurePassword(16, {
+      includeSymbols: true,
+      includeNumbers: true
+    });
+    ```
+  </Tab>
+</Tabs>

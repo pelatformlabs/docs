@@ -1,0 +1,320 @@
+---
+title: 'Overview'
+description: 'Storage utilities for SaaS applications with S3 and Cloudinary support'
+keywords: ["storage", "s3", "cloudinary", "minio", "digitalocean", "supabase", "cloudflare-r2", "aws"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/storage.svg)](https://www.npmjs.com/package/@pelatform/storage)
+
+Comprehensive storage utilities for SaaS applications supporting multiple providers including AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, Supabase Storage, and Cloudinary. Built with TypeScript and designed for production use.
+
+<Columns cols={1}>
+  <Card title="Multi-Provider Support" icon="cloud">
+    <ul>
+      <li><strong>AWS S3</strong>: Full AWS S3 integration</li>
+      <li><strong>Cloudflare R2</strong>: Edge storage solution</li>
+      <li><strong>MinIO</strong>: Self-hosted S3-compatible storage</li>
+      <li><strong>DigitalOcean Spaces</strong>: Cloud storage</li>
+      <li><strong>Supabase Storage</strong>: PostgreSQL-backed storage</li>
+      <li><strong>Cloudinary</strong>: Media management and optimization</li>
+    </ul>
+  </Card>
+
+  <Card title="Advanced Features" icon="zap">
+    <ul>
+      <li><strong>File Validation</strong>: Type, size, and format validation</li>
+      <li><strong>Helper Utilities</strong>: 50+ utility functions</li>
+      <li><strong>MIME Detection</strong>: Automatic file type detection</li>
+      <li><strong>URL Generation</strong>: Public and signed URL generation</li>
+    </ul>
+  </Card>
+
+  <Card title="Developer Friendly" icon="code">
+    <ul>
+      <li><strong>TypeScript First</strong>: Complete type safety</li>
+      <li><strong>Environment Config</strong>: Auto-configuration</li>
+      <li><strong>Simple API</strong>: Intuitive, consistent interface</li>
+      <li><strong>Error Handling</strong>: Comprehensive error management</li>
+    </ul>
+  </Card>
+</Columns>
+
+## Installation
+
+<PackageInstaller command="installer @pelatform/storage @aws-sdk/client-s3 @aws-sdk/s3-request-presigner cloudinary" />
+
+<Note>
+AWS SDK and Cloudinary are peer dependencies. Install only the providers you need.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="Configure Environment">
+    Set up your storage provider environment variables:
+
+    <Tabs>
+      <Tab title="AWS S3">
+        ```bash .env
+        PELATFORM_S3_PROVIDER=aws
+        PELATFORM_S3_REGION=us-east-1
+        PELATFORM_S3_BUCKET=my-bucket
+        PELATFORM_S3_ACCESS_KEY_ID=AKIA...
+        PELATFORM_S3_SECRET_ACCESS_KEY=secret...
+        PELATFORM_S3_PUBLIC_URL=https://my-bucket.s3.us-east-1.amazonaws.com
+        ```
+      </Tab>
+
+      <Tab title="Cloudflare R2">
+        ```bash .env
+        PELATFORM_S3_PROVIDER=cloudflare-r2
+        PELATFORM_S3_REGION=auto
+        PELATFORM_S3_BUCKET=my-r2-bucket
+        PELATFORM_S3_ACCESS_KEY_ID=your-r2-key
+        PELATFORM_S3_SECRET_ACCESS_KEY=your-r2-secret
+        PELATFORM_S3_ENDPOINT=https://account-id.r2.cloudflarestorage.com
+        ```
+      </Tab>
+
+      <Tab title="Cloudinary">
+        ```bash .env
+        PELATFORM_CLOUDINARY_CLOUD_NAME=my-cloud
+        PELATFORM_CLOUDINARY_API_KEY=123456789012345
+        PELATFORM_CLOUDINARY_API_SECRET=your-api-secret
+        PELATFORM_CLOUDINARY_SECURE=true
+        PELATFORM_CLOUDINARY_FOLDER=uploads
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Use Helper Functions">
+    Import and use storage utilities:
+
+    ```typescript src/utils.ts
+    import {
+      generateFileKey,
+      getMimeType,
+      validateFileSize,
+      validateFileType,
+      formatFileSize
+    } from '@pelatform/storage/helpers';
+
+    // Generate unique file key
+    const fileKey = generateFileKey('document.pdf', 'uploads');
+    // Returns: "uploads/document-1703123456789-abc123.pdf"
+
+    // Get MIME type
+    const mimeType = getMimeType('photo.jpg');
+    // Returns: "image/jpeg"
+
+    // Validate file size (5MB limit)
+    const sizeValidation = validateFileSize(file.size, 5 * 1024 * 1024);
+    if (!sizeValidation.valid) {
+      console.error(sizeValidation.error);
+    }
+
+    // Validate file type
+    const typeValidation = validateFileType(file.name, ['image/*', 'application/pdf']);
+    if (!typeValidation.valid) {
+      console.error(typeValidation.error);
+    }
+    ```
+  </Step>
+
+  <Step title="Configuration Management">
+    Load and validate storage configuration:
+
+    ```typescript src/config.ts
+    import {
+      loadStorageConfig,
+      hasStorageConfig,
+      validateS3EnvVars,
+      getStorageProvider
+    } from '@pelatform/storage';
+
+    // Check if storage is configured
+    if (hasStorageConfig()) {
+      const config = loadStorageConfig();
+      console.log('Storage configured:', config.provider);
+    }
+
+    // Get provider name
+    const provider = getStorageProvider();
+    console.log('Provider:', provider); // 'aws', 'cloudinary', etc.
+
+    // Validate environment variables
+    const validation = validateS3EnvVars();
+    if (!validation.valid) {
+      console.error('Missing variables:', validation.missing);
+    }
+    ```
+  </Step>
+</Steps>
+
+## Package Exports
+
+The storage package provides multiple export paths:
+
+<Tabs>
+  <Tab title="Main Export">
+    ```typescript
+    import {
+      // Configuration utilities
+      validateS3EnvVars,
+      validateCloudinaryEnvVars,
+      loadStorageConfig,
+      hasStorageConfig,
+      getStorageProvider,
+
+      // Types
+      StorageConfig,
+      S3Config,
+      CloudinaryConfig,
+      StorageProvider,
+      S3ProviderType,
+
+      // Storage interface
+      StorageInterface
+    } from '@pelatform/storage';
+    ```
+  </Tab>
+
+  <Tab title="S3">
+    ```typescript
+    import {
+      S3Provider,
+      StorageInterface
+    } from '@pelatform/storage/s3';
+    ```
+  </Tab>
+
+  <Tab title="Cloudinary">
+    ```typescript
+    import {
+      CloudinaryProvider,
+      StorageInterface
+    } from '@pelatform/storage/cloudinary';
+    ```
+  </Tab>
+
+  <Tab title="Utils">
+    ```typescript
+    import {
+      generateFileKey,
+      validateFileSize,
+      getMimeType,
+      formatFileSize,
+      // ...50+ helper functions
+    } from '@pelatform/storage/helpers';
+    ```
+  </Tab>
+</Tabs>
+
+## Key Features
+
+### Helper Functions
+
+The package includes 50+ helper functions for common storage operations:
+
+```typescript
+import {
+  // File operations
+  generateFileKey,
+  generateUniqueKey,
+  sanitizeFileName,
+  getFileExtension,
+
+  // Validation
+  validateFileSize,
+  validateFileType,
+  validateS3Key,
+  validateBatchFiles,
+
+  // Type detection
+  getMimeType,
+  isImageFile,
+  isVideoFile,
+  isAudioFile,
+  detectFileTypeFromContent,
+
+  // Format conversion
+  formatFileSize,
+  fileToBuffer,
+  base64ToBuffer,
+  bufferToBase64,
+
+  // URL operations
+  parseS3Url,
+  buildPublicUrl,
+  generateCacheControl,
+  getContentDisposition
+} from '@pelatform/storage/helpers';
+```
+
+### Storage Interface
+
+Unified interface for all storage providers:
+
+```typescript
+import { StorageInterface, S3Provider, CloudinaryProvider } from '@pelatform/storage';
+
+// Both providers implement the same interface
+const s3Storage = new S3Provider(s3Config);
+const cloudinaryStorage = new CloudinaryProvider(cloudinaryConfig);
+
+// Use the same methods regardless of provider
+await storage.uploadFile(key, buffer, options);
+await storage.downloadFile(key);
+await storage.deleteFile(key);
+await storage.fileExists(key);
+```
+
+### Configuration Management
+
+Environment-based configuration with validation:
+
+```typescript
+import {
+  loadStorageConfig,
+  hasStorageConfig,
+  validateS3EnvVars,
+  validateCloudinaryEnvVars
+} from '@pelatform/storage';
+
+// Auto-detect and load configuration
+if (hasStorageConfig()) {
+  const config = loadStorageConfig();
+  console.log('Provider:', config.provider);
+}
+
+// Validate environment variables
+const validation = validateS3EnvVars();
+if (!validation.valid) {
+  console.error('Missing:', validation.missing);
+}
+```
+
+## Documentation
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/toolkits/storage/api">
+    Complete API documentation with factory functions, service methods, and configuration options
+  </Card>
+
+  <Card title="Real-World Examples" icon="examples" href="/toolkits/storage/examples">
+    Production-ready examples for SaaS automation, e-commerce, and notification systems
+  </Card>
+</CardGroup>
+
+### Related
+
+- [Configuration](/toolkits/config) - Development configurations for TypeScript projects
+- [Email Toolkit](/toolkits/email) - Multi-provider email sending and templates
+- [Utils Toolkit](/toolkits/utils) - Utility functions for development
+
+---
+
+Complete storage solution with multi-provider support, 50+ helper functions, and production-ready features for modern SaaS applications.

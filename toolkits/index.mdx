@@ -8,93 +8,63 @@ import { PackageInstaller } from '/snippets/packageinstaller.jsx';
 
 Pelatform Toolkits is a comprehensive collection of development tools designed to accelerate modern SaaS application development. Our toolkits provide everything you need from code quality enforcement to production-ready communication and storage solutions.
 
-<Card title="Development Configs" icon="settings">
-  <ul>
-    <li><strong>ESLint Configurations</strong>: Modern JavaScript/TypeScript linting with React support</li>
-    <li><strong>TypeScript Configs</strong>: Optimized TypeScript configurations for different environments</li>
-    <li><strong>Biome Config</strong>: Fast formatting and linting with modern tooling</li>
-    <li><strong>Vite Integration</strong>: Hot module replacement and build optimizations</li>
-  </ul>
-</Card>
+## Available Toolkits
 
-<Card title="Communication Tools" icon="mail">
-  <ul>
-    <li><strong>Multi-Provider Email</strong>: Support for SMTP, Resend, and Nodemailer</li>
-    <li><strong>React Email Templates</strong>: Beautiful, responsive email components</li>
-    <li><strong>Template System</strong>: Reusable email templates with dynamic content</li>
-    <li><strong>Analytics & Tracking</strong>: Email delivery monitoring and insights</li>
-  </ul>
-</Card>
+Explore our specialized packages designed for modern development:
 
-<Card title="Storage Solutions" icon="cloud">
-  <ul>
-    <li><strong>Multi-Cloud Support</strong>: AWS S3, Cloudinary, DigitalOcean, Supabase, Cloudflare R2</li>
-    <li><strong>Universal Interface</strong>: Consistent API across all storage providers</li>
-    <li><strong>File Management</strong>: Upload, download, and organization utilities</li>
-    <li><strong>Image Processing</strong>: Optimization, resizing, and transformation</li>
-  </ul>
-</Card>
+<Columns cols={1}>
+  <Card title="Configurations" icon="settings" href="/toolkits/config">
+    Standardized configurations for Biome, ESLint, and TypeScript to ensure code quality and consistency across your projects.
+  </Card>
 
-<Card title="Utility Library" icon="code">
-  <ul>
-    <li><strong>100+ Functions</strong>: Comprehensive utilities for common tasks</li>
-    <li><strong>Edge Runtime Ready</strong>: Works in browser and server environments</li>
-    <li><strong>TypeScript First</strong>: Complete type safety and IntelliSense</li>
-    <li><strong>Server Utilities</strong>: Password hashing, JWT handling, security functions</li>
-  </ul>
-</Card>
+  <Card title="Email Service" icon="mail" href="/toolkits/email">
+    Multi-provider email solution supporting Resend and SMTP with React-based templates and automatic provider detection.
+  </Card>
+
+  <Card title="Storage Solution" icon="cloud" href="/toolkits/storage">
+    Unified storage interface for AWS S3, Cloudflare R2, Cloudinary, and compatible providers with file management helpers.
+  </Card>
+
+  <Card title="Utility Library" icon="code" href="/toolkits/utils">
+    Collection of 100+ utility functions for string manipulation, validation, cryptography, and server-side operations.
+  </Card>
+</Columns>
 
 ## Quick Start
 
-Get started with Pelatform Toolkits in minutes. Install individual packages based on your needs:
+Get started with Pelatform Toolkits in minutes. You can install individual packages or the complete suite.
 
 <Steps>
   <Step title="Install Configs">
     Set up your development environment with our configurations:
-
-    <PackageInstaller command="
-    # Install all configurations
-    installer @pelatform/eslint-config @pelatform/tsconfig @pelatform/biome-config
-
-    # Install with Vite support
-    installer @pelatform/eslint-config-vite
-    " />
+    
+    <PackageInstaller command="installer -D @pelatform/biome-config @pelatform/eslint-config @pelatform/tsconfig" />
   </Step>
 
-  <Step title="Add Utilities">
-    Include our utility library for common functions:
+  <Step title="Add Core Libraries">
+    Install the utility and service packages:
 
-    <PackageInstaller command="installer @pelatform/utils" />
-  </Step>
-
-  <Step title="Setup Communication">
-    Add email capabilities to your application:
-
-    <PackageInstaller command="installer @pelatform/email" />
-  </Step>
-
-  <Step title="Configure Storage">
-    Add multi-cloud storage support:
-
-    <PackageInstaller command="installer @pelatform/storage" />
+    <PackageInstaller command="installer @pelatform/email @pelatform/storage @pelatform/utils" />
   </Step>
 </Steps>
 
-## Architecture Overview
+## Architecture & Features
 
-Pelatform Toolkits are designed to work together seamlessly while remaining modular and independently usable:
+Pelatform Toolkits are designed to be modular, type-safe, and production-ready.
 
-### Configuration Foundation
-Start with our configuration packages to establish code quality and development standards across your team.
+<Columns cols={1}>
+  <Card title="Type Safety First" icon="shield-check">
+    All packages are written in TypeScript with strict type definitions, ensuring full IntelliSense support and compile-time safety for your applications.
+  </Card>
 
-### Utility Layer
-Leverage our comprehensive utility library for common operations, validation, and helper functions.
+  <Card title="Browser Edge" icon="compass">
+    Lightweight utilities and helpers optimized for Edge Runtimes and client-side usage.
+  </Card>
 
-### Service Integration
-Add email and storage capabilities with consistent APIs that work across multiple providers.
-
-### Production Ready
-All tools are battle-tested in production environments with comprehensive error handling and monitoring.
+  <Card title="Server Ready" icon="server">
+    Powerful server-side tools for cryptography, file handling, and direct infrastructure access.
+  </Card>
+</Columns>
 
 ## Package Matrix
 
@@ -112,39 +82,16 @@ All tools are battle-tested in production environments with comprehensive error 
 ## Common Use Cases
 
 ### New SaaS Project
-<PackageInstaller command="installer @pelatform/eslint-config @pelatform/tsconfig @pelatform/utils @pelatform/email @pelatform/storage" />
+Initialize a new project with the complete toolkit stack for a solid foundation.
 
-### React Application
-<PackageInstaller command="installer @pelatform/eslint-config-react @pelatform/utils @pelatform/email" />
+<PackageInstaller command="installer @pelatform/utils @pelatform/email @pelatform/storage -D @pelatform/eslint-config @pelatform/tsconfig" />
 
-### Backend API
+### React/Next.js Application
+Use our optimized ESLint config and utilities for frontend development.
+
+<PackageInstaller command="installer @pelatform/utils -D @pelatform/eslint-config-react" />
+
+### Backend Service
+Leverage server-side utilities and storage for API services.
+
 <PackageInstaller command="installer @pelatform/utils @pelatform/storage @pelatform/email" />
-
-### Frontend Only
-<PackageInstaller command="installer @pelatform/utils" />
-
-## Next Steps
-
-Explore each package in detail:
-
-<Columns cols={2}>
-  <Card title="Configurations" icon="settings" href="/toolkits/config">
-    Set up code quality and development standards
-  </Card>
-
-  <Card title="Email" icon="mail" href="/toolkits/email">
-    Multi-provider email sending and templates
-  </Card>
-
-  <Card title="Storage" icon="cloud" href="/toolkits/storage">
-    Multi-cloud file storage and management
-  </Card>
-
-  <Card title="Utilities" icon="code" href="/toolkits/utils">
-    100+ utility functions for development
-  </Card>
-</Columns>
-
-<Note>
-  All Pelatform Toolkits follow semantic versioning and maintain backward compatibility within major versions. Each package can be used independently or combined for a complete development stack.
-</Note>

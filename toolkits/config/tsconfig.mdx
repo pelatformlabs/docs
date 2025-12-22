@@ -10,33 +10,35 @@ import { PackageInstaller } from '/snippets/packageinstaller.jsx';
 
 Collection of TypeScript configuration files optimized for different environments and runtimes. Each configuration file provides best practices with minimal setup.
 
-<Card title="Multi-Environment Support" icon="layers">
-  <ul>
-    <li><strong>Base Configuration</strong>: Core TypeScript settings with strict mode</li>
-    <li><strong>React Applications</strong>: Optimized for React development with JSX support</li>
-    <li><strong>Next.js Projects</strong>: Specialized configuration for Next.js development</li>
-    <li><strong>Node.js Runtime</strong>: Server-side TypeScript with Node.js types</li>
-    <li><strong>Bun Runtime</strong>: Modern JavaScript runtime with Bun-specific types</li>
-    <li><strong>Cloudflare Workers</strong>: Edge computing with Workers types</li>
-  </ul>
-</Card>
+<Columns cols={1}>
+  <Card title="Multi-Environment Support" icon="layers">
+    <ul>
+      <li><strong>Base Configuration</strong>: Core TypeScript settings with strict mode</li>
+      <li><strong>React Applications</strong>: Optimized for React development with JSX support</li>
+      <li><strong>Next.js Projects</strong>: Specialized configuration for Next.js development</li>
+      <li><strong>Node.js Runtime</strong>: Server-side TypeScript with Node.js types</li>
+      <li><strong>Bun Runtime</strong>: Modern JavaScript runtime with Bun-specific types</li>
+      <li><strong>Cloudflare Workers</strong>: Edge computing with Workers types</li>
+    </ul>
+  </Card>
 
-<Card title="Strict Type Safety" icon="shield-check">
-  <ul>
-    <li><strong>Enhanced Type Checking</strong>: Strict mode with comprehensive type rules</li>
-    <li><strong>Modern ES Features</strong>: Support for ES2022 and modern JavaScript</li>
-    <li><strong>Module Resolution</strong>: Optimal module resolution for bundlers</li>
-    <li><strong>Declaration Generation</strong>: Automatic `.d.ts` file generation</li>
-  </ul>
-</Card>
+  <Card title="Strict Type Safety" icon="shield-check">
+    <ul>
+      <li><strong>Enhanced Type Checking</strong>: Strict mode with comprehensive type rules</li>
+      <li><strong>Modern ES Features</strong>: Support for ES2022 and modern JavaScript</li>
+      <li><strong>Module Resolution</strong>: Optimal module resolution for bundlers</li>
+      <li><strong>Declaration Generation</strong>: Automatic `.d.ts` file generation</li>
+    </ul>
+  </Card>
 
-<Card title="Performance Optimized" icon="zap">
-  <ul>
-    <li><strong>Incremental Compilation</strong>: Faster rebuilds with incremental mode</li>
-    <li><strong>Skip Lib Check</strong>: Faster compilation with library type skipping</li>
-    <li><strong>Optimized Targets</strong>: Modern JavaScript target for better performance</li>
-  </ul>
-</Card>
+  <Card title="Performance Optimized" icon="zap">
+    <ul>
+      <li><strong>Incremental Compilation</strong>: Faster rebuilds with incremental mode</li>
+      <li><strong>Skip Lib Check</strong>: Faster compilation with library type skipping</li>
+      <li><strong>Optimized Targets</strong>: Modern JavaScript target for better performance</li>
+    </ul>
+  </Card>
+</Columns>
 
 ## Installation
 
@@ -423,7 +425,7 @@ TypeScript is a peer dependency. Install the version that suits your project req
   </Tab>
 
   <Tab title="Declaration Files">
-    ```json
+    ```json tsconfig.json
     {
       "compilerOptions": {
         "declaration": true,
@@ -435,7 +437,7 @@ TypeScript is a peer dependency. Install the version that suits your project req
   </Tab>
 
   <Tab title="JSX Issues">
-    ```json
+    ```json tsconfig.json
     {
       "compilerOptions": {
         "jsx": "react-jsx",

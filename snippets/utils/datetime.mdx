@@ -1,0 +1,146 @@
+<Tabs>
+  <Tab title="Billing Utils">
+    ```typescript billing-utils.ts
+    import {
+      getLastDayOfMonth,
+      getAdjustedBillingCycleStart,
+      getBillingStartDate
+    } from '@pelatform/utils';
+
+    // Get last day of current month
+    const lastDay = getLastDayOfMonth(); // 31
+
+    // Adjust billing cycle for shorter months
+    const billingDay = getAdjustedBillingCycleStart(31); // 28 (if Feb)
+
+    // Get billing start date
+    const startDate = getBillingStartDate(15);
+    ```
+  </Tab>
+
+  <Tab title="Format Date">
+    ```typescript format-date.ts
+    import { formatDate } from '@pelatform/utils';
+
+    // Basic formatting
+    const date = formatDate(new Date()); // "January 15, 2024"
+
+    // Custom options
+    const custom = formatDate(new Date(), {
+      month: 'short',
+      day: '2-digit'
+    }); // "Jan 15"
+    ```
+  </Tab>
+
+  <Tab title="Format DateTime Smart">
+    ```typescript format-datetime-smart.ts
+    import { formatDateTimeSmart } from '@pelatform/utils';
+
+    // Smart formatting (time for current year, year for others)
+    const current = formatDateTimeSmart(new Date()); // "Jun 15, 10:30 AM"
+    const past = formatDateTimeSmart(new Date('2022-01-01')); // "Jan 1, 2022"
+    ```
+  </Tab>
+
+  <Tab title="Format DateTime">
+    ```typescript format-datetime.ts
+    import { formatDateTime } from '@pelatform/utils';
+
+    const dt = formatDateTime(new Date());
+    // "Jan 15, 2024, 2:30 PM"
+    ```
+  </Tab>
+
+  <Tab title="Format Period">
+    ```typescript format-period.ts
+    import { formatPeriod } from '@pelatform/utils';
+
+    const period = formatPeriod({
+      periodStart: new Date('2023-01-01'),
+      periodEnd: new Date('2023-06-30')
+    });
+    // "Jan-Jun"
+    ```
+  </Tab>
+
+  <Tab title="Format Time">
+    ```typescript format-time.ts
+    import { formatTime } from '@pelatform/utils';
+
+    const time = formatTime(new Date()); // "2:30 PM"
+    ```
+  </Tab>
+
+  <Tab title="Get DateTime Local">
+    ```typescript get-datetime-local.ts
+    import { getDateTimeLocal } from '@pelatform/utils';
+
+    // For HTML input type="datetime-local"
+    const value = getDateTimeLocal(new Date()); // "2024-01-15T14:30"
+    ```
+  </Tab>
+
+  <Tab title="Get Days Difference">
+    ```typescript get-days-difference.ts
+    import { getDaysDifference } from '@pelatform/utils';
+
+    const days = getDaysDifference(
+      new Date('2024-01-01'),
+      new Date('2024-01-10')
+    ); // 9
+    ```
+  </Tab>
+
+  <Tab title="Get First And Last Day">
+    ```typescript get-first-and-last-day.ts
+    import { getFirstAndLastDay } from '@pelatform/utils';
+
+    // Get period boundaries for billing day 15
+    const { firstDay, lastDay } = getFirstAndLastDay(15);
+    ```
+  </Tab>
+
+  <Tab title="Get Year">
+    ```typescript get-year.ts
+    import { getCurrentYear } from '@pelatform/utils';
+
+    const year = getCurrentYear(); // 2025
+    ```
+  </Tab>
+
+  <Tab title="Parse DateTime">
+    ```typescript parse-datetime.ts
+    // Server-side only
+    import { parseDateTime } from '@pelatform/utils/server';
+
+    // Natural language parsing
+    const date = parseDateTime('tomorrow at 3pm');
+    ```
+  </Tab>
+
+  <Tab title="Time Ago">
+    ```typescript time-ago.ts
+    import { timeAgo } from '@pelatform/utils';
+
+    interface TimeAgoOptions {
+      withAgo?: boolean;
+      neverText?: string;
+      justNowText?: string;
+      agoText?: string;
+    }
+
+    const relative = timeAgo(new Date(Date.now() - 60000)); // "1m"
+    const withSuffix = timeAgo(new Date(), { withAgo: true }); // "Just now"
+    ```
+  </Tab>
+
+  <Tab title="Timezone">
+    ```typescript timezone.ts
+    import { getTimeZones } from '@pelatform/utils';
+
+    const timezones = getTimeZones();
+    // [{ label: "(GMT+0) Europe/London", value: "Europe/London" }, ...]
+    ```
+  </Tab>
+</Tabs>

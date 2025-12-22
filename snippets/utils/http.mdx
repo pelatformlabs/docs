@@ -1,0 +1,166 @@
+<Tabs>
+  <Tab title="Fetch With Retry">
+    ```typescript fetch-with-retry.ts
+    import { fetchWithRetry } from '@pelatform/utils';
+
+    // Basic usage
+    try {
+      const response = await fetchWithRetry('https://api.example.com/data');
+      const data = await response.json();
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    }
+
+    // With custom options
+    const response = await fetchWithRetry('https://api.example.com/data',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'value' })
+      },
+      {
+        timeout: 10000,      // 10 second timeout
+        maxRetries: 5,       // Try 5 times maximum
+        retryDelay: 500      // Start with 500ms delay
+      }
+    );
+    ```
+  </Tab>
+
+  <Tab title="Fetch With Timeout">
+    ```typescript fetch-with-timeout.ts
+    import { fetchWithTimeout } from '@pelatform/utils';
+
+    // Basic usage with default timeout (5 seconds)
+    try {
+      const response = await fetchWithTimeout('https://api.example.com/data');
+      const data = await response.json();
+    } catch (error) {
+      console.error('Request failed or timed out:', error);
+    }
+
+    // With custom timeout (2 seconds)
+    const response = await fetchWithTimeout(
+      'https://api.example.com/data',
+      { method: 'GET' },
+      2000
+    );
+    ```
+  </Tab>
+
+  <Tab title="Fetcher">
+    ```typescript fetcher.ts
+    import { fetcher, request } from '@pelatform/utils';
+    import useSWR from 'swr';
+
+    interface SWRError extends Error {
+      info: string | Record<string, unknown>;
+      status: number;
+    }
+
+    type RequestOptions = {
+      headers?: Record<string, string>;
+      log?: boolean;
+    };
+
+    // Basic usage with SWR
+    const { data, error } = useSWR('/api/user', fetcher);
+
+    // Direct usage
+    const userData = await fetcher('/api/user');
+
+    // Using generic request helper
+    // GET request
+    const users = await request('/api/users');
+
+    // POST JSON body
+    const created = await request('/api/users', 'POST', { name: 'Alice' });
+
+    // PUT with custom header
+    const updated = await request('/api/users/1', 'PUT', { name: 'Bob' }, {
+      headers: { Authorization: `Bearer token` },
+    });
+    ```
+  </Tab>
+
+  <Tab title="IP">
+    ```typescript ip.ts
+    import {
+      getClientIP,
+      isValidIP,
+      getUserAgent,
+      getRequestOrigin,
+      getClientIPFromHeaders,
+      getUserAgentFromHeaders,
+      getIPAddress
+    } from '@pelatform/utils';
+
+    // In a Next.js API route or Middleware
+    export function middleware(request: NextRequest) {
+      // Get Client IP
+      const clientIP = getClientIP(request);
+
+      // Validate IP
+      const isValid = isValidIP(clientIP);
+
+      // Get User Agent
+      const userAgent = getUserAgent(request);
+
+      // Get Origin info
+      const { origin, referer, host } = getRequestOrigin(request);
+    }
+
+    // In Express/Node.js environment
+    const ip = getClientIPFromHeaders(req.headers);
+    const agent = getUserAgentFromHeaders(req.headers);
+
+    // Client-side IP detection (browser)
+    const publicIP = await getIPAddress();
+    ```
+  </Tab>
+
+  <Tab title="Parse Request">
+    ```typescript parse-request.ts
+    import { parse, normalizePath } from '@pelatform/utils';
+    import type { NextRequest } from "next/server";
+
+    export interface ParsedRequest {
+      domain: string;
+      path: string;
+      fullPath: string;
+      key: string;
+      fullKey: string;
+      searchParamsObj: Record<string, string>;
+      searchParamsString: string;
+    }
+
+    // Parse Next.js Request
+    export function middleware(req: NextRequest) {
+      const {
+        domain,           // e.g., "api.pelatform.com"
+        path,             // e.g., "/v1/users"
+        fullPath,         // e.g., "/v1/users?page=1"
+        key,              // e.g., "v1"
+        searchParamsObj   // e.g., { page: "1" }
+      } = parse(req);
+    }
+
+    // Normalize path string
+    normalizePath("dashboard");       // "/dashboard"
+    normalizePath("//a///b");         // "/a/b"
+    ```
+  </Tab>
+
+  <Tab title="Recaptcha">
+    ```typescript recaptcha.ts
+    import { verifyRecaptchaToken } from '@pelatform/utils';
+
+    // Verify token server-side
+    const isValid = await verifyRecaptchaToken(token);
+
+    if (!isValid) {
+      throw new Error('reCAPTCHA verification failed');
+    }
+    ```
+  </Tab>
+</Tabs>

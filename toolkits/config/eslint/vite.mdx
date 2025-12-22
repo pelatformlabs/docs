@@ -11,17 +11,19 @@ import { PackageRun } from '/snippets/packagerun.jsx';
 
 Comprehensive ESLint configuration specifically designed for Vite projects. This package extends the React ESLint config with Vite-specific optimizations, React Refresh support for HMR, and TanStack Router integration.
 
-<Card title="Vite Integration" icon="zap">
-  Optimized for Vite with React Refresh HMR support and build tool-specific rules
-</Card>
+<Columns cols={1}>
+  <Card title="Vite Integration" icon="zap">
+    Optimized for Vite with React Refresh HMR support and build tool-specific rules
+  </Card>
 
-<Card title="TanStack Router" icon="route">
-  Built-in linting for TanStack Router with best practices and route validation
-</Card>
+  <Card title="TanStack Router" icon="route">
+    Built-in linting for TanStack Router with best practices and route validation
+  </Card>
 
-<Card title="Hot Module Replacement" icon="refresh-cw">
-  React Refresh rules ensuring seamless development experience with fast refresh
-</Card>
+  <Card title="Hot Module Replacement" icon="refresh-cw">
+    React Refresh rules ensuring seamless development experience with fast refresh
+  </Card>
+</Columns>
 
 ## Installation
 
@@ -512,7 +514,7 @@ export default [
 <Accordion title="React Refresh Issues">
   Ensure proper component exports:
 
-  ```js
+  ```tsx component.tsx
   // ✅ Default export
   export default function MyComponent() {
     return <div>Component</div>;
@@ -531,7 +533,7 @@ export default [
 <Accordion title="TanStack Router Rules">
   Router rules only apply to files importing the library:
 
-  ```js
+  ```ts router.ts
   import { createRouter } from '@tanstack/react-router';
   // Router rules automatically apply
   ```

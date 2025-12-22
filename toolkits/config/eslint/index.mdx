@@ -11,17 +11,19 @@ import { PackageRun } from '/snippets/packagerun.jsx';
 
 Comprehensive ESLint configuration designed for modern TypeScript projects. This package provides strict type checking, comprehensive linting rules, and seamless integration with Turborepo.
 
-<Card title="Strict TypeScript" icon="file-type">
-  Type-aware ESLint configuration with strict type checking and comprehensive TypeScript rules
-</Card>
+<Columns cols={1}>
+  <Card title="Strict TypeScript" icon="file-type">
+    Type-aware ESLint configuration with strict type checking and comprehensive TypeScript rules
+  </Card>
 
-<Card title="Turborepo Ready" icon="zap">
-  Pre-configured for monorepo environments with Turborepo integration and optimized performance
-</Card>
+  <Card title="Turborepo Ready" icon="zap">
+    Pre-configured for monorepo environments with Turborepo integration and optimized performance
+  </Card>
 
-<Card title="Modern ESLint 9" icon="shield-check">
-  Built on ESLint 9.x with flat config system for better configuration management and performance
-</Card>
+  <Card title="Modern ESLint 9" icon="shield-check">
+    Built on ESLint 9.x with flat config system for better configuration management and performance
+  </Card>
+</Columns>
 
 ## Installation
 
@@ -313,7 +315,7 @@ export default [
 <Accordion title="TypeScript Project Not Found">
   Ensure `tsconfig.json` is in the same directory as `eslint.config.js`:
 
-  ```js
+  ```js eslint.config.js
   {
     languageOptions: {
       parserOptions: {
@@ -327,7 +329,7 @@ export default [
 <Accordion title="Type Checking Errors">
   Disable type-aware linting for non-strict projects:
 
-  ```js
+  ```js eslint.config.js
   import { configs } from "@pelatform/eslint-config";
   import tsParser from "@typescript-eslint/parser";
 

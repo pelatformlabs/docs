@@ -1,0 +1,666 @@
+---
+title: 'Examples'
+description: 'Real-world email implementation examples using Pelatform Email package for SaaS applications'
+keywords: ["email", "examples", "saas", "automation", "ecommerce", "notifications", "templates", "react-email"]
+---
+
+Real-world implementation examples showing how to use Pelatform Email package in production scenarios. Each example includes complete, working code that you can adapt for your applications.
+
+## SaaS Welcome Email Series
+
+### Automated Onboarding Flow
+
+```typescript welcome-series.ts
+import { createEmail } from '@pelatform/email';
+
+// Welcome email templates
+import { WelcomeEmail } from './templates/WelcomeEmail';
+import { OnboardingStepEmail } from './templates/OnboardingStepEmail';
+import { CompletedOnboardingEmail } from './templates/CompletedOnboardingEmail';
+
+const emailService = createEmail();
+
+async function sendWelcomeSeries(user: User, plan: string) {
+  const emails = [
+    {
+      template: WelcomeEmail,
+      props: { userName: user.name, plan, onboardingUrl: `${process.env.APP_URL}/onboarding` },
+      delay: 0, // Send immediately
+    },
+    {
+      template: OnboardingStepEmail,
+      props: {
+        userName: user.name,
+        step: 1,
+        stepName: 'Profile Setup',
+        stepUrl: `${process.env.APP_URL}/onboarding/profile`
+      },
+      delay: 24 * 60 * 60 * 1000, // 24 hours later
+    },
+    {
+      template: OnboardingStepEmail,
+      props: {
+        userName: user.name,
+        step: 2,
+        stepName: 'Add Team Members',
+        stepUrl: `${process.env.APP_URL}/onboarding/team`
+      },
+      delay: 48 * 60 * 60 * 1000, // 48 hours later
+    },
+    {
+      template: CompletedOnboardingEmail,
+      props: { userName: user.name, plan, dashboardUrl: `${process.env.APP_URL}/dashboard` },
+      delay: 72 * 60 * 60 * 1000 // 72 hours later
+    }
+  ];
+
+  for (const email of emails) {
+    setTimeout(async () => {
+      try {
+        await emailService.sendTemplate(
+          email.template,
+          email.props,
+          {
+            to: user.email,
+            subject: email.template.defaultProps.subject
+          }
+        );
+      } catch (error) {
+        console.error(`Failed to send ${email.template.name}:`, error);
+      }
+    }, email.delay);
+  }
+}
+```
+
+### User Reactivation Campaign
+
+```typescript reactivation-campaign.ts
+import { createEmail } from '@pelatform/email';
+import { ReactivationEmail } from './templates/ReactivationEmail';
+
+const emailService = createEmail();
+
+async function sendReactivationCampaign(inactiveUsers: User[]) {
+  const results = await Promise.allSettled(
+    inactiveUsers.map(async (user) => {
+      return await emailService.sendTemplate(
+        ReactivationEmail,
+        {
+          userName: user.name,
+          lastLogin: user.lastLogin,
+          plan: user.plan,
+          reactivationUrl: `${process.env.APP_URL}/reactivate?token=${user.reactivationToken}`
+        },
+        {
+          to: user.email,
+          subject: `We miss you at ${process.env.APP_NAME}!`,
+          tags: {
+            campaign: 'reactivation',
+            userSegment: user.plan
+          }
+        }
+      );
+    })
+  );
+
+  // Log results for analytics
+  const successful = results.filter(result => result.status === 'fulfilled').length;
+  const failed = results.filter(result => result.status === 'rejected').length;
+
+  console.log(`Reactivation campaign: ${successful} successful, ${failed} failed`);
+
+  return { successful, failed, results };
+}
+```
+
+## E-commerce Transactional Emails
+
+### Order Confirmation with Receipt
+
+```typescript filename="order-confirmation.ts"
+import { createEmail } from '@pelatform/email';
+import { OrderConfirmationEmail } from './templates/OrderConfirmationEmail';
+import fs from 'fs/promises';
+import path from 'path';
+
+const emailService = createEmail();
+
+async function sendOrderConfirmation(order: Order, user: User) {
+  try {
+    // Generate PDF receipt
+    const pdfBuffer = await generateOrderReceiptPDF(order);
+
+    // Create tracking pixel
+    const trackingPixel = emailService.generateTrackingPixel(
+      `${process.env.API_URL}/email/track`,
+      `order_${order.id}`,
+      user.id
+    );
+
+    await emailService.sendTemplate(
+      OrderConfirmationEmail,
+      {
+        userName: user.name,
+        order,
+        trackingPixel,
+        supportEmail: 'support@myecommerce.com'
+      },
+      {
+        to: user.email,
+        subject: `Order Confirmation #${order.id}`,
+        attachments: [
+          {
+            filename: `receipt-${order.id}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ],
+        tags: {
+          orderId: order.id,
+          orderValue: order.total.toString(),
+          customer: user.id
+        }
+      }
+    );
+
+    // Update order status
+    await updateOrderStatus(order.id, 'confirmation_sent');
+  } catch (error) {
+    console.error(`Failed to send order confirmation for order ${order.id}:`, error);
+    throw error;
+  }
+}
+
+// PDF generation helper
+async function generateOrderReceiptPDF(order: Order): Promise<Buffer> {
+  // Implementation would use a PDF library like puppeteer or jsPDF
+  // This is a placeholder for the actual implementation
+  return Buffer.from('PDF receipt content');
+}
+```
+
+### Shipping Updates with Tracking
+
+```typescript filename="shipping-updates.ts"
+import { createEmail } from '@pelatform/email';
+import { ShippingUpdateEmail } from './templates/ShippingUpdateEmail';
+
+const emailService = createEmail();
+
+async function sendShippingUpdate(
+  shipment: Shipment,
+  customer: User,
+  updateType: 'created' | 'shipped' | 'delivered' | 'delayed'
+) {
+  const updates = {
+    created: {
+      subject: `Your Order ${shipment.orderId} Has Been Shipped!`,
+      status: 'shipped'
+    },
+    shipped: {
+      subject: `Your Package is on its Way! - Order ${shipment.orderId}`,
+      status: 'in_transit'
+    },
+    delivered: {
+      subject: `Delivered! Your Order ${shipment.orderId}`,
+      status: 'delivered'
+    },
+    delayed: {
+      subject: `Shipping Delay - Order ${shipment.orderId}`,
+      status: 'delayed'
+    }
+  };
+
+  const update = updates[updateType];
+
+  return await emailService.sendTemplate(
+    ShippingUpdateEmail,
+    {
+      userName: customer.name,
+      orderNumber: shipment.orderId,
+      trackingNumber: shipment.trackingNumber,
+      carrier: shipment.carrier,
+      estimatedDelivery: shipment.estimatedDelivery,
+      trackingUrl: shipment.trackingUrl,
+      status: update.status,
+      supportEmail: 'support@myecommerce.com'
+    },
+    {
+      to: customer.email,
+      subject: update.subject,
+      priority: updateType === 'delayed' ? 1 : 3, // High priority for delays
+      tags: {
+        shipmentId: shipment.id,
+        orderId: shipment.orderId,
+        status: update.status,
+        carrier: shipment.carrier
+      }
+    }
+  );
+}
+```
+
+## Notification System
+
+### User Activity Notifications
+
+```typescript notifications.ts
+import { createEmail } from '@pelatform/email';
+import { ActivityNotificationEmail } from './templates/ActivityNotificationEmail';
+
+const emailService = createEmail();
+
+class NotificationService {
+  async sendLoginAlert(user: User, loginInfo: LoginInfo): Promise<void> {
+    // Only send for suspicious logins
+    if (this.isSuspiciousLogin(user, loginInfo)) {
+      await emailService.sendTemplate(
+        ActivityNotificationEmail,
+        {
+          userName: user.name,
+          activity: 'New login detected',
+          details: {
+            location: loginInfo.location,
+            device: loginInfo.device,
+            time: loginInfo.time,
+            ip: loginInfo.ip
+          },
+          securityActions: {
+            changePassword: `${process.env.APP_URL}/security/change-password`,
+            enable2FA: `${process.env.APP_URL}/security/2fa`,
+            contactSupport: 'support@myapp.com'
+          }
+        },
+        {
+          to: user.email,
+          subject: 'Security Alert: New Login to Your Account',
+          priority: 1 // High priority for security
+        }
+      );
+    }
+  }
+
+  async sendFeatureUpdate(user: User, feature: Feature, updateType: 'new' | 'improved' | 'deprecated'): Promise<void> {
+    const updates = {
+      new: `${feature.name} is now available!`,
+      improved: `${feature.name} has been improved`,
+      deprecated: `${feature.name} will be deprecated soon`
+    };
+
+    await emailService.sendTemplate(
+      ActivityNotificationEmail,
+      {
+        userName: user.name,
+        activity: updates[updateType],
+        details: {
+          feature: feature.name,
+          description: feature.description,
+          availableDate: feature.availableDate,
+          deprecationDate: feature.deprecationDate,
+          learnMoreUrl: feature.documentationUrl
+        },
+        actions: {
+          tryFeature: `${process.env.APP_URL}${feature.path}`,
+          giveFeedback: 'mailto:feedback@myapp.com',
+          contactSupport: 'support@myapp.com'
+        }
+      },
+      {
+        to: user.email,
+        subject: `${feature.name} Update`,
+        tags: {
+          featureId: feature.id,
+          updateType,
+          userTier: user.plan
+        }
+      }
+    );
+  }
+
+  async sendWeeklyDigest(user: User, digestData: WeeklyDigest): Promise<void> {
+    await emailService.sendTemplate(
+      ActivityNotificationEmail,
+      {
+        userName: user.name,
+        activity: 'Your weekly digest',
+        details: digestData,
+        actions: {
+          viewDashboard: `${process.env.APP_URL}/dashboard`,
+          adjustPreferences: `${process.env.APP_URL}/settings/notifications`
+        }
+      },
+      {
+        to: user.email,
+        subject: `Your ${process.env.APP_NAME} Weekly Digest`,
+        scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // Tomorrow
+      }
+    );
+  }
+
+  private isSuspiciousLogin(user: User, loginInfo: LoginInfo): boolean {
+    const recentLogins = this.getRecentLogins(user.id);
+    const currentLocation = `${loginInfo.city}, ${loginInfo.country}`;
+
+    // Check for login from new location or device
+    const hasNewLocation = !recentLogins.some(login => login.location === currentLocation);
+    const hasNewDevice = !recentLogins.some(login => login.device === loginInfo.device);
+
+    return hasNewLocation || hasNewDevice;
+  }
+}
+```
+
+### Team Collaboration Notifications
+
+```typescript
+import { createEmail } from '@pelatform/email';
+import { TeamNotificationEmail } from './templates/TeamNotificationEmail';
+
+const emailService = createEmail();
+
+async function sendProjectInvite(invite: ProjectInvite, inviter: User): Promise<void> {
+  return await emailService.sendTemplate(
+    TeamNotificationEmail,
+    {
+      recipientName: invite.recipientName,
+      inviterName: inviter.name,
+      projectName: invite.project.name,
+      projectDescription: invite.project.description,
+      role: invite.role,
+      inviteUrl: `${process.env.APP_URL}/invite/${invite.token}`,
+      expiresAt: invite.expiresAt
+    },
+    {
+      to: invite.email,
+      subject: `Invitation to join ${invite.project.name} on ${process.env.APP_NAME}`,
+      tags: {
+        projectId: invite.project.id,
+        inviterId: inviter.id,
+        inviteToken: invite.token
+      }
+    }
+  );
+}
+
+async function sendMentionNotification(
+  mention: Mention,
+  mentionedUser: User,
+  author: User,
+  context: 'comment' | 'task' | 'project'
+): Promise<void> {
+  return await emailService.sendTemplate(
+    TeamNotificationEmail,
+    {
+      recipientName: mentionedUser.name,
+      authorName: author.name,
+      activity: `You were mentioned in a ${context}`,
+      details: {
+        content: mention.content,
+        contextUrl: mention.url,
+        projectName: mention.project.name
+      },
+      actions: {
+        viewContext: mention.url,
+        manageNotifications: `${process.env.APP_URL}/settings/notifications`
+      }
+    },
+    {
+      to: mentionedUser.email,
+      subject: `${author.name} mentioned you in ${process.env.APP_NAME}`,
+      priority: 4 // Lower priority for mentions
+    }
+  );
+}
+```
+
+## Newsletter System
+
+### Bulk Email Campaign
+
+```typescript
+import { createEmail } from '@pelatform/email';
+import { NewsletterEmail } from './templates/NewsletterEmail';
+
+const emailService = createEmail();
+
+async function sendNewsletterCampaign(
+  campaign: NewsletterCampaign,
+  subscribers: NewsletterSubscriber[]
+): Promise<BulkEmailResult> {
+  // Chunk subscribers to avoid rate limiting
+  const chunkSize = 100; // Send to 100 subscribers at once
+  const chunks = emailService.chunkEmails(
+    subscribers.map(sub => sub.email),
+    chunkSize
+  );
+
+  let totalSent = 0;
+  let totalFailed = 0;
+  const allResults: EmailResult[] = [];
+
+  for (const chunk of chunks) {
+    const chunkResults = await Promise.allSettled(
+      chunk.map(async (email) => {
+        try {
+          const result = await emailService.sendTemplate(
+            NewsletterEmail,
+            {
+              subscriberName: email.name,
+              campaignSubject: campaign.subject,
+              content: campaign.content,
+              unsubscribeLink: emailService.generateUnsubscribeLink(
+                `${process.env.APP_URL}/newsletter/unsubscribe`,
+                email.email,
+                email.unsubscribeToken
+              ),
+              trackingPixel: emailService.generateTrackingPixel(
+                `${process.env.API_URL}/newsletter/open`,
+                campaign.id,
+                email.id
+              ),
+              preferencesLink: `${process.env.APP_URL}/newsletter/preferences`
+            },
+            {
+              to: email.email,
+              subject: campaign.subject,
+              headers: {
+                'List-Unsubscribe': `<mailto:${process.env.NOREPLY_EMAIL}>`,
+                'X-Campaign-ID': campaign.id
+              }
+            }
+          );
+          totalSent++;
+          return result;
+        } catch (error) {
+          totalFailed++;
+          throw error;
+        }
+      })
+    );
+
+    // Process results
+    chunkResults.forEach(result => {
+      if (result.status === 'fulfilled') {
+        allResults.push(result.value);
+      } else {
+        allResults.push({
+          success: false,
+          error: result.reason?.message || 'Unknown error'
+        });
+      }
+    });
+
+    // Rate limiting between chunks
+    if (chunks.indexOf(chunk) < chunks.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+    }
+  }
+
+  return {
+    success: totalFailed === 0,
+    total: subscribers.length,
+    sent: totalSent,
+    failed: totalFailed,
+    results: allResults,
+    errors: []
+  };
+}
+```
+
+## Advanced Email Features
+
+### A/B Testing Email Templates
+
+```typescript
+import { createEmail } from '@pelatform/email';
+import { WelcomeEmailVariantA, WelcomeEmailVariantB } from './templates/WelcomeEmail';
+
+const emailService = createEmail();
+
+async function sendABTestWelcome(user: User): Promise<void> {
+  // A/B test logic
+  const useVariantA = user.id.charCodeAt(0) % 2 === 0;
+  const Template = useVariantA ? WelcomeEmailVariantA : WelcomeEmailVariantB;
+  const variant = useVariantA ? 'A' : 'B';
+
+  const result = await emailService.sendTemplate(
+    Template,
+    {
+      userName: user.name,
+      plan: user.plan,
+      variant
+    },
+    {
+      to: user.email,
+      subject: `Welcome to ${process.env.APP_NAME}!`,
+      tags: {
+        campaign: 'welcome_ab_test',
+        variant,
+        userSegment: user.plan
+      }
+    }
+  );
+
+  // Track A/B test result
+  await trackABTestResult(user.id, 'welcome', variant, result.success);
+}
+```
+
+### Scheduled Email Reminders
+
+```typescript
+import { createEmail } from '@pelatform/email';
+import { ReminderEmail } from './templates/ReminderEmail';
+
+const emailService = createEmail();
+
+async function schedulePaymentReminders(invoice: Invoice): Promise<void> {
+  const reminders = [
+    {
+      daysBefore: 7,
+      subject: `Payment Reminder: Invoice #${invoice.id} due in 7 days`
+    },
+    {
+      daysBefore: 3,
+      subject: `Payment Reminder: Invoice #${invoice.id} due in 3 days`
+    },
+    {
+      daysBefore: 1,
+      subject: `Final Notice: Invoice #${invoice.id} due tomorrow`
+    },
+    {
+      daysBefore: 0,
+      subject: `URGENT: Invoice #${invoice.id} is due today`
+    }
+  ];
+
+  for (const reminder of reminders) {
+    const scheduledDate = new Date(invoice.dueDate);
+    scheduledDate.setDate(scheduledDate.getDate() - reminder.daysBefore);
+
+    await emailService.sendTemplate(
+      ReminderEmail,
+      {
+        customerName: invoice.customer.name,
+        invoiceNumber: invoice.id,
+        amount: invoice.amount,
+        dueDate: invoice.dueDate,
+        daysOverdue: reminder.daysBefore === 0 ? 0 : null,
+        paymentUrl: `${process.env.APP_URL}/invoices/${invoice.id}/pay`
+      },
+      {
+        to: invoice.customer.email,
+        subject: reminder.subject,
+        scheduledAt: scheduledDate,
+        priority: reminder.daysBefore === 0 ? 1 : 3
+      }
+    );
+  }
+}
+```
+
+## Error Handling and Retry Logic
+
+### Robust Email Sending with Retry
+
+```typescript
+import { createEmail } from '@pelatform/email';
+
+const emailService = createEmail();
+
+class RobustEmailService {
+  async sendWithRetry(
+    emailFn: () => Promise<EmailResult>,
+    maxRetries: number = 3,
+    backoffMs: number = 1000
+  ): Promise<EmailResult> {
+    let lastError: Error;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const result = await emailFn();
+        if (result.success) {
+          return result;
+        }
+
+        throw new Error(result.error || 'Email send failed');
+      } catch (error) {
+        lastError = error as Error;
+
+        if (attempt === maxRetries) {
+          break;
+        }
+
+        // Exponential backoff
+        const delay = backoffMs * Math.pow(2, attempt - 1);
+        await new Promise(resolve => setTimeout(resolve, delay));
+
+        console.warn(`Email send attempt ${attempt} failed, retrying in ${delay}ms:`, error.message);
+      }
+    }
+
+      return {
+        success: false,
+        error: lastError?.message || 'Max retries exceeded'
+      };
+  }
+
+  async sendCriticalEmail(options: SendEmailOptions): Promise<EmailResult> {
+    return this.sendWithRetry(
+      () => emailService.sendEmail({
+        ...options,
+        priority: 1, // High priority for critical emails
+        headers: {
+          ...options.headers,
+          'X-Critical-Email': 'true'
+        }
+      }),
+      5, // More retries for critical emails
+      2000 // Longer backoff
+    );
+  }
+}
+```
+
+These examples demonstrate real-world scenarios you might encounter when implementing email functionality in your SaaS applications. Each example includes proper error handling, tracking, and follows best practices for email deliverability.

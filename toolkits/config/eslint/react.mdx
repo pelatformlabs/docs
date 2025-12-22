@@ -11,17 +11,19 @@ import { PackageRun } from '/snippets/packagerun.jsx';
 
 Comprehensive ESLint configuration specifically designed for React projects. This package extends the base ESLint config with React-specific rules, hooks validation, JSX accessibility, and TanStack Query linting support.
 
-<Card title="React Best Practices" icon="react">
-  Complete React ruleset with hooks validation, JSX runtime support, and TypeScript integration
-</Card>
+<Columns cols={1}>
+  <Card title="React Best Practices" icon="react">
+    Complete React ruleset with hooks validation, JSX runtime support, and TypeScript integration
+  </Card>
 
-<Card title="TanStack Query" icon="database">
-  Built-in linting for TanStack Query with best practices and optimization rules
-</Card>
+  <Card title="TanStack Query" icon="database">
+    Built-in linting for TanStack Query with best practices and optimization rules
+  </Card>
 
-<Card title="Accessibility Guidance" icon="braces">
-  Recommended accessibility practices for React components; add `eslint-plugin-jsx-a11y` if needed
-</Card>
+  <Card title="Accessibility Guidance" icon="braces">
+    Recommended accessibility practices for React components; add `eslint-plugin-jsx-a11y` if needed
+  </Card>
+</Columns>
 
 ## Installation
 
@@ -406,7 +408,7 @@ Consider using `@pelatform/eslint-config-vite` for Vite + React projects.
 <Accordion title="React Version Detection">
   Set explicit React version if auto-detection fails:
 
-  ```js
+  ```js eslint.config.js
   {
     settings: {
       react: {
@@ -420,7 +422,7 @@ Consider using `@pelatform/eslint-config-vite` for Vite + React projects.
 <Accordion title="JSX Parsing Errors">
   Ensure JSX is configured for your file types:
 
-  ```js
+  ```js eslint.config.js
   {
     files: ["**/*.tsx"],
     languageOptions: {
@@ -437,7 +439,7 @@ Consider using `@pelatform/eslint-config-vite` for Vite + React projects.
 <Accordion title="TanStack Query Rules">
   Rules only apply to files importing the library:
 
-  ```js
+  ```js eslint.config.js
   {
     files: ["**/queries/**/*.ts", "**/hooks/**/*.ts"],
     // TanStack Query rules automatically applied

@@ -1,0 +1,27 @@
+<Tabs>
+  <Tab title="Format File Size">
+    ```typescript format-file-size.ts
+    import { formatFileSize } from '@pelatform/utils';
+
+    // Basic usage
+    formatFileSize(1024);
+    // Returns "1 KB"
+
+    // Larger file size
+    formatFileSize(1536);
+    // Returns "1.5 KB"
+
+    // With custom decimal places
+    formatFileSize(1536, 0);
+    // Returns "2 KB"
+
+    // Larger sizes automatically use appropriate units
+    formatFileSize(1048576);
+    // Returns "1 MB"
+
+    // Using decimal base (1000) instead of binary (1024)
+    formatFileSize(1000000, 2, 1000);
+    // Returns "1 MB"
+    ```
+  </Tab>
+</Tabs>

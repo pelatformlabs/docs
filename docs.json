@@ -114,32 +114,7 @@
               "toolkits/storage/examples"
             ]
           },
-          {
-            "group": "Utils",
-            "pages": [
-              "toolkits/utils/index",
-              "toolkits/utils/server"
-            ]
-          }
-        ]
-      },
-      {
-        "group": "UI Core",
-        "icon": "palette",
-        "pages": [
-          "ui/index",
-          "ui/general",
-          "ui/hook"
-        ]
-      },
-      {
-        "group": "UI Components",
-        "icon": "component",
-        "pages": [
-          "ui/animation",
-          "ui/aria",
-          "ui/base",
-          "ui/default"
+          "toolkits/utils"
         ]
       },
       {

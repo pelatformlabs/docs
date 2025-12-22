@@ -1,0 +1,52 @@
+<Tabs>
+  <Tab title="Logger">
+    ```typescript logger.ts
+    import { logger } from '@pelatform/utils';
+
+    // Basic logging
+    logger.info('User logged in successfully');
+    logger.warn('API rate limit approaching');
+    logger.error('Database connection failed');
+    logger.debug('Processing user data', { userId: 123 });
+
+    // With context data
+    logger.info('User action completed', {
+      userId: 'user_123',
+      action: 'profile_update',
+      timestamp: new Date().toISOString()
+    });
+
+    // Error logging with stack trace
+    try {
+      await riskyOperation();
+    } catch (error) {
+      logger.error('Operation failed', { error, context: 'user-service' });
+    }
+    ```
+  </Tab>
+
+  <Tab title="Slack Log">
+    ```typescript slack-log.ts
+    import { SlackLog } from '@pelatform/utils';
+
+    // Log an error to Slack
+    await SlackLog({
+      message: "Database connection failed",
+      type: "errors"
+    });
+
+    // Log with a mention
+    await SlackLog({
+      message: "Critical system failure",
+      type: "alerts",
+      mention: true
+    });
+
+    // Log subscriber activity
+    await SlackLog({
+      message: "New subscriber: user@example.com",
+      type: "subscribers"
+    });
+    ```
+  </Tab>
+</Tabs>

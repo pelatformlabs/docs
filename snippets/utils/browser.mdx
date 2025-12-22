@@ -1,0 +1,120 @@
+<Tabs>
+  <Tab title="Construct Metadata">
+    ```typescript construct-metadata.ts
+    import { constructMetadata, mapLocale } from '@pelatform/utils';
+
+    type metadataProps = {
+      baseUrl?: string;
+      title?: string;
+      fullTitle?: string;
+      description?: string;
+      icons?: Array<Record<string, any>>;
+      url?: string;
+      image?: string | null;
+      video?: string | null;
+      openGraph?: {
+        type?: string;
+        locale?: string;
+        name?: string;
+      };
+      twitter?: {
+        site?: string;
+        creator?: string;
+      };
+      canonicalUrl?: string;
+      alternateLanguages?: Record<string, string>;
+      noIndex?: boolean;
+      noArchive?: boolean;
+      noSnippet?: boolean;
+      manifest?: string | URL | null;
+    };
+
+    // Basic page metadata
+    const metadata = constructMetadata({
+      title: 'Home',
+      description: 'Welcome to Pelatform',
+      url: '/home'
+    });
+    ```
+  </Tab>
+
+  <Tab title="Cookies">
+    ```typescript cookies.ts
+    import {
+      setCookie,
+      getCookie,
+      removeCookie,
+      hasCookie,
+      getAllCookies,
+      clearAllCookies
+    } from '@pelatform/utils';
+
+    interface CookieOptions {
+      expires?: number; // Expiration time in days
+      path?: string;
+      domain?: string;
+      secure?: boolean; // HTTPS only
+      sameSite?: "strict" | "lax" | "none";
+      httpOnly?: boolean; // Server-side only
+    }
+
+    // Set a cookie
+    setCookie('theme', 'dark', { expires: 30 });
+
+    // Get a cookie
+    const theme = getCookie('theme'); // "dark"
+
+    // Check if cookie exists
+    const hasTheme = hasCookie('theme'); // true
+    ```
+  </Tab>
+
+  <Tab title="Get Height">
+    ```typescript get-height.ts
+    import { getHeight } from '@pelatform/utils';
+
+    const element = document.getElementById('my-element');
+    const height = getHeight(element);
+    ```
+  </Tab>
+
+  <Tab title="Resize Image">
+    ```typescript resize-image.ts
+    import {
+      resizeImage,
+      resizeAndCropImage,
+      loadImage,
+      fileToBase64
+    } from '@pelatform/utils';
+
+    interface ResizeOptions {
+      width: number;
+      height: number;
+      quality?: number; // 0.0 to 1.0 (default: 1.0)
+    }
+
+    // Resize image file
+    const resized = await resizeImage(file, { width: 800, height: 600, quality: 0.8 });
+    ```
+  </Tab>
+
+  <Tab title="Storage">
+    ```typescript storage.ts
+    import {
+      getStorageItem,
+      setStorageItem,
+      removeStorageItem,
+      clearStorage,
+      hasStorageItem
+    } from '@pelatform/utils';
+
+    type StorageType = "localStorage" | "sessionStorage";
+
+    // Save to localStorage (default)
+    setStorageItem('user_settings', { theme: 'dark' });
+
+    // Get from sessionStorage
+    const sessionData = getStorageItem('session_key', 'sessionStorage');
+    ```
+  </Tab>
+</Tabs>

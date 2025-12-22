@@ -1,0 +1,62 @@
+<Tabs>
+  <Tab title="Deep Equal">
+    ```typescript deep-equal.ts
+    import { deepEqual } from '@pelatform/utils';
+
+    // Compare objects deeply
+    const obj1 = { a: 1, b: { c: 2 } };
+    const obj2 = { a: 1, b: { c: 2 } };
+    
+    deepEqual(obj1, obj2); // true
+    deepEqual({ a: 1 }, { a: 2 }); // false
+    ```
+  </Tab>
+
+  <Tab title="Email">
+    ```typescript email.ts
+    import { validateEmail } from '@pelatform/utils';
+
+    // Validate email
+    const result = validateEmail('user@example.com');
+    // { isValid: true, normalized: 'user@example.com', ... }
+
+    // Check disposable email
+    const disposable = validateEmail('temp@10minutemail.com');
+    // { isValid: true, details: { isDisposable: true, ... } }
+    ```
+  </Tab>
+
+  <Tab title="Iframeable">
+    ```typescript is-iframeable.ts
+    import { isIframeable } from '@pelatform/utils';
+
+    // Check if URL allows iframe embedding
+    const check = async () => {
+      const canEmbed = await isIframeable({
+        url: 'https://example.com',
+        requestDomain: 'https://myapp.com'
+      });
+      // true/false based on X-Frame-Options / CSP
+    };
+    ```
+  </Tab>
+
+  <Tab title="Keys">
+    ```typescript keys.ts
+    import { 
+      validKeyRegex, 
+      isUnsupportedKey, 
+      isReservedKeyGlobal 
+    } from '@pelatform/utils';
+
+    // Validate key format
+    validKeyRegex.test('my-key'); // true
+
+    // Check unsupported keys
+    isUnsupportedKey('.well-known'); // true
+
+    // Check reserved keys
+    isReservedKeyGlobal('robots.txt'); // true
+    ```
+  </Tab>
+</Tabs>

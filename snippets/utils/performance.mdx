@@ -1,0 +1,43 @@
+<Tabs>
+  <Tab title="Debounce">
+    ```typescript debounce.ts
+    import { debounce } from '@pelatform/utils';
+
+    // Debounce search input
+    const debouncedSearch = debounce((query: string) => {
+      performSearch(query);
+    }, 500);
+
+    // Use in input handler
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      debouncedSearch(e.target.value);
+    };
+
+    // Debounce window resize
+    const debouncedResize = debounce(() => {
+      handleWindowResize();
+    }, 250);
+
+    window.addEventListener('resize', debouncedResize);
+    ```
+  </Tab>
+
+  <Tab title="Throttle">
+    ```typescript throttle.ts
+    import { throttle } from '@pelatform/utils';
+
+    // Throttle scroll event handler
+    const handleScroll = throttle(() => {
+      console.log('Scroll event fired');
+      updateScrollPosition();
+    }, 100);
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Throttle API calls
+    const throttledSearch = throttle((query: string) => {
+      searchAPI(query);
+    }, 300);
+    ```
+  </Tab>
+</Tabs>

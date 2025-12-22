@@ -1,0 +1,436 @@
+---
+title: 'Utils'
+description: 'A comprehensive library of utility functions for building modern SaaS applications'
+keywords: ["utils", "utilities", "helpers", "validation", "crypto", "datetime", "string", "url", "http", "performance"]
+---
+
+import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+import Constants from '/snippets/utils/constants.mdx';
+import Analytics from '/snippets/utils/analytics.mdx';
+import Array from '/snippets/utils/array.mdx';
+import Browser from '/snippets/utils/browser.mdx';
+import Crypto from '/snippets/utils/crypto.mdx';
+import DateTime from '/snippets/utils/datetime.mdx';
+import File from '/snippets/utils/file.mdx';
+import Http from '/snippets/utils/http.mdx';
+import Logging from '/snippets/utils/logging.mdx';
+import Performance from '/snippets/utils/performance.mdx';
+import String from '/snippets/utils/string.mdx';
+import Url from '/snippets/utils/url.mdx';
+import Validation from '/snippets/utils/validation.mdx';
+
+[![Version](https://img.shields.io/npm/v/@pelatform/utils.svg)](https://www.npmjs.org/package/@pelatform/utils)
+
+A comprehensive library of utility functions for building modern SaaS applications. This package provides 100+ utility functions across multiple categories including validation, crypto, datetime, string manipulation, URL handling, HTTP operations, and more.
+
+<Columns cols={1}>
+  <Card title="100+ Utilities" icon="layers">
+    <ul>
+      <li><strong>String Utils</strong>: Truncate, capitalize, camelCase, currency formatter</li>
+      <li><strong>Datetime Utils</strong>: Smart formatting, timezone handling, time ago</li>
+      <li><strong>Crypto Utils</strong>: JWT, hashing, nanoid, cuid, secure random</li>
+      <li><strong>Validation Utils</strong>: Email validation, deep equality, URL validation</li>
+    </ul>
+  </Card>
+
+  <Card title="Edge Runtime Ready" icon="zap">
+    <ul>
+      <li><strong>Browser Compatible</strong>: Works in browser and Node.js environments</li>
+      <li><strong>Server Export</strong>: Additional server-only utilities via `/server`</li>
+      <li><strong>Edge Optimized</strong>: Functions optimized for edge runtime</li>
+      <li><strong>Zero Dependencies</strong>: Minimal external dependencies</li>
+    </ul>
+  </Card>
+
+  <Card title="TypeScript First" icon="code">
+    <ul>
+      <li><strong>Full Type Safety</strong>: Complete TypeScript definitions</li>
+      <li><strong>Tree Shakable</strong>: Import only what you need</li>
+      <li><strong>Consistent API</strong>: Uniform function signatures</li>
+      <li><strong>Extensive Tests</strong>: Comprehensive test coverage</li>
+    </ul>
+  </Card>
+</Columns>
+
+## Installation
+
+<PackageInstaller command="installer @pelatform/utils" />
+
+## Exports
+
+The utils package provides multiple export paths:
+
+<Tabs>
+  <Tab title="Main Export">
+    ```typescript index.ts
+    import {
+      // Browser-compatible utilities
+      slugify,
+      cn,
+      truncate,
+      formatFileSize,
+      timeAgo,
+      nanoid,
+      cuid,
+      // ...100+ more utilities
+    } from '@pelatform/utils';
+    ```
+  </Tab>
+
+  <Tab title="Server Export">
+    ```typescript server.ts
+    import {
+      // Server-only utilities
+      hashPassword,
+      generateRandomString,
+      generateJWT,
+      verifyJWT,
+      parseDateTime
+    } from '@pelatform/utils/server';
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+The `/server` export includes utilities that require Node.js APIs like `crypto`, `bcrypt`, or `jsonwebtoken`.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="String Utilities">
+    Manipulate and format strings:
+
+    ```typescript
+    import { cn, truncate, capitalize, camelCase, slugify } from '@pelatform/utils';
+
+    // Tailwind class merging
+    const className = cn('px-4 py-2', 'bg-blue-500', { 'opacity-50': disabled });
+
+    // Text truncation
+    const short = truncate('This is a very long text', { length: 20 });
+    // "This is a very l..."
+
+    // Capitalize
+    const title = capitalize('hello world');
+    // "Hello World"
+
+    // Camel case
+    const camel = camelCase('hello world example');
+    // "helloWorldExample"
+
+    // Slugify
+    const slug = slugify('Hello World! This is Awesome');
+    // "hello-world-this-is-awesome"
+    ```
+  </Step>
+
+  <Step title="Datetime Utilities">
+    Format and manipulate dates:
+
+    ```typescript
+    import {
+      formatDateTime,
+      formatDateTimeSmart,
+      timeAgo,
+      getDaysDifference,
+      getFirstAndLastDay
+    } from '@pelatform/utils';
+
+    const date = new Date('2024-01-15T14:30:00Z');
+
+    // Smart formatting
+    const smart = formatDateTimeSmart(date);
+    // "January 15, 2024 at 2:30 PM" (based on current date)
+
+    // Custom formatting
+    const formatted = formatDateTime(date, 'MMM dd, yyyy');
+    // "Jan 15, 2024"
+
+    // Relative time
+    const relative = timeAgo(date);
+    // "2 months ago" (or actual time difference)
+
+    // Days between dates
+    const days = getDaysDifference(date, new Date());
+    // 45
+
+    // Month boundaries
+    const { firstDay, lastDay } = getFirstAndLastDay('2024-01');
+    // First: 2024-01-01, Last: 2024-01-31
+    ```
+  </Step>
+
+  <Step title="Crypto Utilities">
+    Generate IDs and handle security:
+
+    ```typescript
+    import { nanoid, cuid, hashStringSHA256 } from '@pelatform/utils';
+
+    // Generate unique IDs
+    const nanoId = nanoid();
+    // "V1StGXR8_Z5jdHi6B-myT"
+
+    const cuidId = cuid();
+    // "ck4b8v9pg0001mjl1m7g3h123"
+
+    // Hash strings
+    const hash = await hashStringSHA256('my-secret-data');
+    // "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+    ```
+  </Step>
+
+  <Step title="Validation Utilities">
+    Validate data and deep compare objects:
+
+    ```typescript
+    import {
+      validateEmail,
+      isValidUrl,
+      deepEqual,
+      isIframeable
+    } from '@pelatform/utils';
+
+    // Email validation
+    const emailResult = validateEmail('user@example.com');
+    // { isValid: true, normalized: 'user@example.com' }
+
+    // URL validation
+    const urlValid = isValidUrl('https://example.com');
+    // true
+
+    // Deep equality check
+    const obj1 = { a: 1, b: { c: 2 } };
+    const obj2 = { a: 1, b: { c: 2 } };
+    const isEqual = deepEqual(obj1, obj2);
+    // true
+
+    // Check if URL can be iframed
+    const canIframe = isIframeable('https://example.com');
+    // false (X-Frame-Options)
+    ```
+  </Step>
+</Steps>
+
+## Categories
+
+### Constants
+
+A collection of constant values used across the application for configuration, themes, validation, and more.
+
+<Constants />
+
+### Analytics
+
+Analytics utilities for tracking events, user interactions, and CRUD operations.
+
+<Analytics />
+
+### Array
+
+Utility functions for array manipulation, sorting, and random selection.
+
+<Array />
+
+### Browser
+
+Browser-specific utilities for metadata, cookies, DOM manipulation, image processing, and storage.
+
+<Browser />
+
+### Crypto
+
+Cryptographic and security-related utilities for hashing, token generation, and unique IDs.
+
+<Crypto />
+
+### Datetime
+
+Date and time manipulation utilities for formatting, parsing, and calculations.
+
+<DateTime />
+
+### File
+
+Utility functions for file manipulation and formatting.
+
+<File />
+
+### Http
+
+HTTP networking utilities for fetching data, retry logic, IP detection, and request parsing.
+
+<Http />
+
+### Logging
+
+Centralized logging utilities for application events and Slack integration.
+
+<Logging />
+
+### Performance
+
+Performance optimization utilities like debounce and throttle to control function execution frequency.
+
+<Performance />
+
+### String
+
+Utility functions for string manipulation and formatting.
+
+<String />
+
+### URL
+
+Utility functions for URL manipulation, validation, and formatting.
+
+<Url />
+
+### Validation
+
+Utility functions for data validation and verification.
+
+<Validation />
+
+## Server-Only Utilities
+
+Server utilities provide essential security and authentication functions:
+
+- **Password Security**: BCrypt hashing, verification, secure password generation
+- **JWT Operations**: Token generation, verification, expiration handling
+- **Cryptographic Functions**: Secure random string generation
+- **HTTP Security**: IP extraction, request parsing, user agent detection
+- **Advanced DateTime**: Natural language parsing for server environments
+
+```typescript
+import {
+  hashPassword,
+  verifyPassword,
+  generateJWT,
+  verifyJWT,
+  generateRandomString
+} from '@pelatform/utils/server';
+
+// Password hashing (bcrypt)
+const hashed = await hashPassword('password123');
+const isValid = await verifyPassword('password123', hashed);
+
+// JWT with expiration
+const token = generateJWT(
+  { userId: '123', role: 'admin' },
+  'your-secret',
+  { expiresIn: '7d' }
+);
+```
+
+## Edge Runtime Compatibility
+
+Most utilities are compatible with edge runtimes. Server-only utilities require Node.js APIs:
+
+<Tabs>
+  <Tab title="Edge Compatible">
+    ```typescript
+    import {
+      // ✅ Edge compatible
+      slugify,
+      cn,
+      truncate,
+      formatDateTime,
+      timeAgo,
+      nanoid,
+      cuid,
+      hashStringSHA256,
+      validateEmail,
+      deepEqual,
+      fetcher,
+      debounce,
+      throttle
+    } from '@pelatform/utils';
+    ```
+  </Tab>
+
+  <Tab title="Node.js Only">
+    ```typescript
+    import {
+      // ❌ Requires Node.js APIs
+      hashPassword,
+      verifyPassword,
+      generateJWT,
+      verifyJWT,
+      generateRandomString,
+      parseDateTime
+    } from '@pelatform/utils/server';
+    ```
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+<Accordion title="Tree Shaking">
+  Import only what you need for optimal bundle size:
+
+  ```typescript
+  // ✅ Good: Tree shakable
+  import { cn, truncate } from '@pelatform/utils';
+
+  // ❌ Avoid: Import entire bundle
+  import * as utils from '@pelatform/utils';
+  ```
+</Accordion>
+
+<Accordion title="Error Handling">
+  Many utils are safe by design, but handle errors appropriately:
+
+  ```typescript
+  try {
+    const result = validateEmail('user@example.com');
+    if (!result.isValid) {
+      return { error: result.error };
+    }
+  } catch (error) {
+    logger.error('Email validation failed', error);
+    return { error: 'Validation failed' };
+  }
+  ```
+</Accordion>
+
+<Accordion title="Performance">
+  Use performance utilities to optimize your app:
+
+  ```typescript
+  // Debounce search inputs
+  const debouncedSearch = debounce(handleSearch, 300);
+
+  // Throttle resize handlers
+  const throttledResize = throttle(handleResize, 100);
+
+  // Use nanoid for unique IDs instead of timestamps
+  const id = nanoid();
+  ```
+</Accordion>
+
+<Accordion title="TypeScript">
+  Leverage full type safety:
+
+  ```typescript
+  import type {
+    FormatDateTimeOptions,
+    CurrencyFormatterOptions,
+    ValidationResult
+  } from '@pelatform/utils';
+
+  const format = (date: Date, options: FormatDateTimeOptions) => {
+    return formatDateTime(date, options.format);
+  };
+  ```
+</Accordion>
+
+## Related Documentation
+
+- [Configuration](/toolkits/config) - Development configurations for TypeScript projects
+- [Email Toolkit](/toolkits/email) - Multi-provider email sending and templates
+- [Storage Toolkit](/toolkits/storage) - Multi-cloud file storage and management
+
+---
+
+**Total Utilities**: 100+ functions across 10+ categories for modern SaaS development.

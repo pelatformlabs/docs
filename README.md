@@ -6,19 +6,20 @@ Documentation for Pelatform Labs Packages, built with [Mintlify](https://mintlif
 
 ```
 docs/
-├── config/                    # Documentation configuration
-│   ├── api-reference/         # API endpoint documentation
-│   │   ├── endpoint/          # Individual endpoint docs
-│   │   ├── introduction.mdx   # API overview
-│   │   └── pagination.mdx     # Pagination guide
-│   └── guides/                # Integration guides and tutorials
-│       ├── integrations/      # Framework-specific guides
-│       ├── introduction.mdx   # Getting started
-│       └── quickstart.mdx     # Quick setup guide
 ├── images/                    # Documentation images and assets
 ├── logo/                      # Brand assets
+├── sample/                    # Mintlify component examples and guides
 ├── snippets/                  # Reusable content snippets
+│   ├── utils/                 # Utility function documentation snippets
+│   └── *.jsx                  # Custom React components (Installer, etc.)
+├── toolkits/                  # Main documentation content
+│   ├── config/                # Configuration packages (ESLint, TSConfig, Biome)
+│   ├── email/                 # Email package documentation
+│   ├── storage/               # Storage package documentation
+│   └── utils.mdx              # Utils package documentation
 ├── docs.json                  # Mintlify configuration
+├── index.mdx                  # Home page
+├── quickstart.mdx             # Quick start guide
 └── README.md                  # This file
 ```
 

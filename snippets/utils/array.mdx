@@ -1,0 +1,36 @@
+<Tabs>
+  <Tab title="Chunk">
+    ```typescript chunk.ts
+    import { chunk } from '@pelatform/utils';
+
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8];
+    const chunks = chunk(numbers, 3);
+    // [[1, 2, 3], [4, 5, 6], [7, 8]]
+    ```
+  </Tab>
+
+  <Tab title="Random Value">
+    ```typescript random-value.ts
+    import { randomValue } from '@pelatform/utils';
+
+    const colors = ['red', 'green', 'blue'];
+    const randomColor = randomValue(colors);
+    // "green" (randomly selected)
+    ```
+  </Tab>
+
+  <Tab title="Stable Sort">
+    ```typescript stable-sort.ts
+    import { stableSort } from '@pelatform/utils';
+
+    const users = [
+      { name: 'Alice', role: 'admin', id: 1 },
+      { name: 'Bob', role: 'user', id: 2 },
+      { name: 'Charlie', role: 'user', id: 3 }
+    ];
+
+    // Sort by role, preserving original order for same roles
+    const sorted = stableSort(users, (a, b) => a.role.localeCompare(b.role));
+    ```
+  </Tab>
+</Tabs>

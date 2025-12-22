@@ -1,0 +1,117 @@
+<Tabs>
+  <Tab title="Domains">
+    ```typescript domains.ts
+    import { 
+      generateDomainFromName, 
+      validDomainRegex, 
+      validSlugRegex 
+    } from '@pelatform/utils';
+
+    // Generate domain from name
+    const domain = generateDomainFromName('My Cool Project');
+    // "mycoolproject.link"
+
+    // Validate domain
+    const isDomain = validDomainRegex.test('example.com');
+    // true
+
+    // Validate slug
+    const isSlug = validSlugRegex.test('my-page-slug');
+    // true
+    ```
+  </Tab>
+
+  <Tab title="Link Constructor">
+    ```typescript link-constructor.ts
+    import { linkConstructor } from '@pelatform/utils';
+
+    // Construct URL with options
+    const url = linkConstructor({
+      domain: 'example.com',
+      key: 'page',
+      searchParams: { q: 'search' }
+    });
+    // "https://example.com/page?q=search"
+
+    // Pretty URL (no protocol)
+    const pretty = linkConstructor({
+      domain: 'example.com',
+      pretty: true
+    });
+    // "example.com"
+    ```
+  </Tab>
+
+  <Tab title="Search Params">
+    ```typescript search-params.ts
+    import { getSearchParams, getSearchParamsWithArray } from '@pelatform/utils';
+
+    // Get params as object
+    const params = getSearchParams('https://example.com?name=John&age=30');
+    // { name: 'John', age: '30' }
+
+    // Get params handling arrays
+    const multiParams = getSearchParamsWithArray('https://example.com?tag=a&tag=b');
+    // { tag: ['a', 'b'] }
+    ```
+  </Tab>
+
+  <Tab title="URL Conversion">
+    ```typescript url-conversion.ts
+    import { getUrlFromString } from '@pelatform/utils';
+
+    // Convert string to URL
+    const url1 = getUrlFromString('example.com');
+    // "https://example.com"
+
+    const url2 = getUrlFromString('https://site.com');
+    // "https://site.com"
+    ```
+  </Tab>
+
+  <Tab title="URL Formatting">
+    ```typescript url-formatting.ts
+    import { getPrettyUrl, getSlug } from '@pelatform/utils';
+
+    // Format URL for display
+    const pretty = getPrettyUrl('https://www.example.com/page/');
+    // "example.com/page"
+
+    // Generate slug
+    const slug = getSlug('Hello World! 2024');
+    // "hello-world-2024"
+    ```
+  </Tab>
+
+  <Tab title="URL Validation">
+    ```typescript url-validation.ts
+    import { isValidUrl } from '@pelatform/utils';
+
+    // Validate URL string
+    isValidUrl('https://example.com'); // true
+    isValidUrl('invalid-url'); // false
+    ```
+  </Tab>
+
+  <Tab title="UTM Params">
+    ```typescript utm-params.ts
+    import { 
+      constructURLFromUTMParams, 
+      getUrlWithoutUTMParams 
+    } from '@pelatform/utils';
+
+    // Add UTM params
+    const trackedUrl = constructURLFromUTMParams('https://example.com', {
+      utm_source: 'twitter',
+      utm_campaign: 'spring_sale'
+    });
+    // "https://example.com?utm_source=twitter&utm_campaign=spring_sale"
+
+    // Remove UTM params
+    const cleanUrl = getUrlWithoutUTMParams(
+      'https://example.com?utm_source=twitter&page=1'
+    );
+    // "https://example.com?page=1"
+    ```
+  </Tab>
+</Tabs>
