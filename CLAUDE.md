@@ -9,11 +9,13 @@ This is the documentation site for Pelatform Labs packages - a collection of dev
 ## Development Commands
 
 ### Start Development Server
+
 ```bash
 mintlify dev
 ```
 
 The Mintlify CLI must be installed globally first:
+
 ```bash
 npm i -g mintlify
 ```
@@ -43,6 +45,7 @@ docs/
 ### Code Block Format
 
 Always use the correct format for code blocks:
+
 ````mdx
 ```language filename
 code here
@@ -50,31 +53,35 @@ code here
 ````
 
 Examples of correct formats:
+
 - `js eslint.config.js` - JavaScript config file
 - `json package.json` - JSON file
 - `jsx component.tsx` - JSX/TSX file
 - `yaml .github/workflows/ci.yml` - YAML workflow file
 
-**Never use**: `filename="extension"` syntax (e.g., ```js filename="app.js"```)
+**Never use**: `filename="extension"` syntax (e.g., `js filename="app.js"`)
 
 ### Package Installation Commands
 
 Use the custom `PackageInstaller` component for multi-package manager support:
 
 ```mdx
-import { PackageInstaller } from '/snippets/packageinstaller.jsx';
+import { PackageInstaller } from "/snippets/packageinstaller.jsx";
 
 // Single command
+
 <PackageInstaller command="installer -D @pelatform/package-name" />
 
 // Multiple commands with comments
+
 <PackageInstaller
   command="
   # TypeScript configuration
   installer -D @pelatform/tsconfig typescript
 
-  # Biome configuration
-  installer -D @pelatform/biome-config @biomejs/biome
+# Biome configuration
+
+installer -D @pelatform/biome-config @biomejs/biome
 " />
 ```
 
@@ -85,7 +92,7 @@ The component automatically generates pnpm, npm, yarn, and bun commands.
 Use the `PackageRun` component for script commands:
 
 ```mdx
-import { PackageRun } from '/snippets/packagerun.jsx';
+import { PackageRun } from "/snippets/packagerun.jsx";
 
 <PackageRun command="run lint" />
 <PackageRun command="run lint:fix" />
@@ -96,10 +103,12 @@ import { PackageRun } from '/snippets/packagerun.jsx';
 Refer to `sample/guide.mdx` for comprehensive component reference.
 
 **Card Usage Patterns:**
+
 - Use individual `<Card>` for longer content
 - Use `<Columns>` with multiple `<Card>` for short, grouped content
 
 **Callout Types:**
+
 - `<Note>` - General notes
 - `<Warning>` - Warnings
 - `<Info>` - Informational tips
@@ -108,6 +117,7 @@ Refer to `sample/guide.mdx` for comprehensive component reference.
 - `<Danger>` - Critical warnings
 
 **For tutorials/guides:**
+
 - Use `<Steps>` with `<Step>` components for sequential instructions
 - Use `<Tabs>` with `<Tab>` for alternative approaches
 - Use `<Accordion>` for optional/advanced content
@@ -117,6 +127,7 @@ Refer to `sample/guide.mdx` for comprehensive component reference.
 ### Package Documentation Template
 
 Each package documentation should include:
+
 1. Frontmatter with title, description, keywords
 2. NPM version badge
 3. Feature overview using `<Columns>` with `<Card>`
@@ -150,11 +161,13 @@ At the bottom of documentation pages, include related docs:
 ## Navigation Structure
 
 Navigation is defined in `docs.json`. The structure uses:
+
 - **Groups**: Top-level sections with icons
 - **Pages**: Individual documentation files
 - **Hidden groups**: Sample pages (not shown in navigation)
 
 When adding new documentation pages:
+
 1. Add entries to the appropriate group in `docs.json`
 2. Create the `.mdx` file in the corresponding directory
 
