@@ -20,6 +20,12 @@ The Mintlify CLI must be installed globally first:
 npm i -g mintlify
 ```
 
+### Build and Deploy
+
+```bash
+mintlify build --output out
+```
+
 ## Documentation Structure
 
 ```
@@ -29,11 +35,11 @@ docs/
 │   ├── email/            # Email package docs
 │   ├── storage/          # Storage package docs
 │   ├── index.mdx         # Toolkits overview
-│   └── utils.mdx         # Utils package docs
+│   └── utils.mdx         # Utils package docs (imports from snippets/utils/*)
 ├── snippets/             # Reusable React components and content
 │   ├── packageinstaller.jsx  # Multi-package manager installer component
 │   ├── packagerun.jsx        # Multi-package manager run command component
-│   └── utils/               # Utils category content snippets
+│   └── utils/               # 13 category snippet files for utils documentation
 ├── sample/              # Mintlify component examples (hidden from nav)
 ├── docs.json            # Site navigation and configuration
 ├── index.mdx            # Home page
@@ -178,6 +184,36 @@ When adding new documentation pages:
 3. **Import consistency**: Validate all import statements for custom components
 4. **Component usage**: Only use documented Mintlify components (check `sample/guide.mdx`)
 5. **Card vs Cards**: Use `<Card>` (singular), NOT `<Cards>` (doesn't exist)
+
+## Architecture
+
+### Custom Components
+
+The documentation uses custom React components in `snippets/`:
+
+- **PackageInstaller** (`snippets/packageinstaller.jsx`): Multi-package manager installer that replaces `installer` keyword with `pnpm add`, `npm install`, `yarn add`, or `bun add`
+- **PackageRun** (`snippets/packagerun.jsx`): Multi-package manager run command component
+
+### Utils Documentation Pattern
+
+Utils documentation uses a modular snippet pattern:
+
+- Main file: `toolkits/utils.mdx` (overview, installation, quick start)
+- Category snippets: `snippets/utils/*.mdx` (13 category files imported as components)
+- Each category snippet contains `<Tabs>` with code examples for utilities in that category
+
+### Navigation Structure
+
+Navigation is defined in `docs.json`. The structure uses:
+
+- **Groups**: Top-level sections with icons
+- **Pages**: Individual documentation files
+- **Hidden groups**: Sample pages (not shown in navigation)
+
+When adding new documentation pages:
+
+1. Add entries to the appropriate group in `docs.json`
+2. Create the `.mdx` file in the corresponding directory
 
 ## MCP Server Integration
 
